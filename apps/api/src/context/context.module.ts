@@ -4,7 +4,11 @@ import { CONTEXT_RETRIEVERS, ContextService, type ContextRetriever } from './con
 @Module({
   providers: [
     { provide: CONTEXT_RETRIEVERS, useValue: [] satisfies ContextRetriever[] },
-    { provide: ContextService, inject: [CONTEXT_RETRIEVERS], useFactory: (retrievers: ContextRetriever[]) => new ContextService(retrievers) },
+    {
+      provide: ContextService,
+      inject: [CONTEXT_RETRIEVERS],
+      useFactory: (retrievers: ContextRetriever[]) => new ContextService(retrievers),
+    },
   ],
   exports: [ContextService],
 })

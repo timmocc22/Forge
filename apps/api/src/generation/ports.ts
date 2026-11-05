@@ -26,6 +26,8 @@ export interface GenerationGateway extends GenerationProvider {
   ): Promise<unknown>;
 }
 export interface StructuredTextRequest {
+  /** Server-owned limits, independent of the provider wire protocol. */
+  budget?: { maxToolCalls?: number; maxHistoryCharacters?: number };
   tools?: {
     definitions: {
       type: 'function';

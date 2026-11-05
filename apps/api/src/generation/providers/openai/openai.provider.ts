@@ -107,67 +107,90 @@ export class OpenAIProvider implements GenerationProvider {
   ): Promise<unknown> {
     const tools = request.tools!;
     const history: unknown[] = [{ role: 'user', content: request.input }];
+    const maxHistory = request.budget?.maxHistoryCharacters ?? 1000000;
+    if (!Number.isSafeInteger(maxHistory) || maxHistory < 1 || maxHistory > 10000000)
+      throw new ProviderError('CONTEXT_LIMIT', '工具上下文预算无效');
     try {
       return await runToolLoop({
         signal,
+        maxCalls: request.budget?.maxToolCalls,
         step: async () => {
-      const raw = await this.request(
-        'responses',
-        {
-          model,
-          store: false,
-          include: ['reasoning.encrypted_content'],
-          instructions: request.instructions,
-          input: history,
-          tools: tools.definitions,
-          parallel_tool_calls: false,
-          text: {
-            format: {
-              type: 'json_schema',
-              name: request.name,
-              strict: true,
-              schema: request.schema,
+          if (
+            request.instructions.length +
+              JSON.stringify({ history, definitions: tools.definitions }).length >
+            maxHistory
+          )
+            throw new ProviderError(
+              'CONTEXT_LIMIT',
+              '工具上下文过长，请缩小修改范围或改用逐页任务',
+            );
+          const raw = await this.request(
+            'responses',
+            {
+              model,
+              store: false,
+              include: ['reasoning.encrypted_content'],
+              instructions: request.instructions,
+              input: history,
+              tools: tools.definitions,
+              parallel_tool_calls: false,
+              text: {
+                format: {
+                  type: 'json_schema',
+                  name: request.name,
+                  strict: true,
+                  schema: request.schema,
+                },
+              },
             },
-          },
-        },
-        signal,
-        request.reasoningEffort,
-      );
-      const response = toolResponse.parse(raw);
-      if (response.status && response.status !== 'completed')
-        throw new ProviderError('INCOMPLETE_OUTPUT', '模型输出不完整，请重试');
-      const requested = response.output.filter((item) => item.type === 'function_call');
-      if (!requested.length) {
-        const parsed = textResponse.parse(raw);
-        const parts = parsed.output.flatMap((item) =>
-          item.type === 'message' ? (item.content ?? []) : [],
-        );
-        if (parts.some((item) => item.type === 'refusal'))
-          throw new ProviderError('MODEL_REFUSAL', '模型未能处理这条消息，请调整输入');
-        try {
-          return { kind: 'final' as const, value: JSON.parse(
-            parts
-              .filter((item) => item.type === 'output_text')
-              .map((item) => item.text ?? '')
-              .join(''),
-          ) };
-        } catch {
-          throw new ProviderError(
-            'INVALID_STRUCTURED_OUTPUT',
-            '模型没有返回有效的结构化内容，请重试',
+            signal,
+            request.reasoningEffort,
           );
-        }
-      }
-      history.push(...response.output);
-      return { kind: 'tools', calls: requested.map((item) => {
-        const call = functionCall.parse(item);
-        return { id: call.call_id, name: call.name, arguments: call.arguments };
-      }) };
+          const response = toolResponse.parse(raw);
+          if (response.status && response.status !== 'completed')
+            throw new ProviderError('INCOMPLETE_OUTPUT', '模型输出不完整，请重试');
+          const requested = response.output.filter((item) => item.type === 'function_call');
+          if (!requested.length) {
+            const parsed = textResponse.parse(raw);
+            const parts = parsed.output.flatMap((item) =>
+              item.type === 'message' ? (item.content ?? []) : [],
+            );
+            if (parts.some((item) => item.type === 'refusal'))
+              throw new ProviderError('MODEL_REFUSAL', '模型未能处理这条消息，请调整输入');
+            try {
+              return {
+                kind: 'final' as const,
+                value: JSON.parse(
+                  parts
+                    .filter((item) => item.type === 'output_text')
+                    .map((item) => item.text ?? '')
+                    .join(''),
+                ),
+              };
+            } catch {
+              throw new ProviderError(
+                'INVALID_STRUCTURED_OUTPUT',
+                '模型没有返回有效的结构化内容，请重试',
+              );
+            }
+          }
+          history.push(...response.output);
+          return {
+            kind: 'tools',
+            calls: requested.map((item) => {
+              const call = functionCall.parse(item);
+              return { id: call.call_id, name: call.name, arguments: call.arguments };
+            }),
+          };
         },
         execute: (call) => tools.execute(call.name, call.arguments),
-        observe: (call, output) => { history.push({
-          type: 'function_call_output', call_id: call.id, output: JSON.stringify(output),
-        }); },
+        observe: (call, output) => {
+          history.push({
+            type: 'function_call_output',
+            call_id: call.id,
+            output: JSON.stringify(output),
+          });
+        },
       });
     } catch (error) {
       if (error instanceof ToolLoopError)

@@ -254,7 +254,12 @@ describe('Responses function calling', () => {
       vi.fn(async () =>
         Response.json({
           output: [
-            { type: 'function_call', call_id: `call_${calls++}`, name: 'list_scenes', arguments: '{}' },
+            {
+              type: 'function_call',
+              call_id: `call_${calls++}`,
+              name: 'list_scenes',
+              arguments: '{}',
+            },
           ],
         }),
       ),
@@ -274,5 +279,28 @@ describe('Responses function calling', () => {
       ),
     ).rejects.toMatchObject({ code: 'TOOL_LIMIT' });
     expect(execute).toHaveBeenCalledTimes(12);
+  });
+  it('bounds replayed tool observations before making another paid model request', async () => {
+    const fetch = vi.fn(async () =>
+      Response.json({
+        output: [{ type: 'function_call', call_id: '1', name: 'read_scene', arguments: '{}' }],
+      }),
+    );
+    vi.stubGlobal('fetch', fetch);
+    await expect(
+      new OpenAIProvider(config).complete(
+        'test',
+        {
+          instructions: 'Answer',
+          input: 'Read',
+          name: 'answer',
+          schema: {},
+          budget: { maxHistoryCharacters: 500 },
+          tools: { definitions: [], execute: async () => 'x'.repeat(600) },
+        },
+        new AbortController().signal,
+      ),
+    ).rejects.toMatchObject({ code: 'CONTEXT_LIMIT' });
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });
