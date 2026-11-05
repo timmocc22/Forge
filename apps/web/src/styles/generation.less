@@ -1,0 +1,35 @@
+@property --generation-hue {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+:root {
+  --generation-color-one: #ffbf48;
+  --generation-color-two: #be4a1d;
+  --generation-cycle-duration: 6s;
+  --generation-ambience-opacity: 0.06;
+}
+
+:root[data-theme='dark'] {
+  --generation-ambience-opacity: 0.1;
+}
+
+@keyframes generation-hue-cycle {
+  0%,
+  100% {
+    --generation-hue: 0deg;
+  }
+  20% {
+    --generation-hue: -30deg;
+  }
+  40% {
+    --generation-hue: -60deg;
+  }
+  60% {
+    --generation-hue: -90deg;
+  }
+  80% {
+    --generation-hue: -45deg;
+  }
+}

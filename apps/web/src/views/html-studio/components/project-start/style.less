@@ -1,0 +1,212 @@
+.start-landing {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 32px;
+}
+.start-welcome {
+  flex: 1;
+  min-height: 220px;
+  padding: 28px 0 48px;
+}
+.start-section {
+  width: min(100%, 720px);
+  margin: auto auto 0;
+  flex-shrink: 0;
+}
+.composer-preferences {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+.start-composer {
+  padding: 18px 16px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 20px;
+  background: var(--background);
+  box-shadow: 0 3px 12px #00000008;
+  transition: border-color 0.15s;
+  &:focus-within {
+    border-color: var(--control-focus);
+  }
+  > textarea {
+    display: block;
+    width: 100%;
+    min-height: 102px;
+    max-height: 240px;
+    padding: 4px 7px 12px;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    resize: none;
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+    &::placeholder {
+      color: var(--subtle);
+    }
+  }
+}
+.composer-controls,
+.composer-tools,
+.composer-submit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.composer-controls {
+  justify-content: space-between;
+}
+.composer-submit {
+  gap: 8px;
+}
+.attach-button,
+.options-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  &:hover:not(:disabled),
+  &[aria-expanded='true'] {
+    background: var(--hover);
+    color: var(--text);
+  }
+}
+.attach-button {
+  width: 36px;
+  padding: 0;
+  font-size: 24px;
+  font-weight: 300;
+}
+.options-button {
+  gap: 7px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.options-summary {
+  color: var(--subtle);
+  margin-left: 3px;
+}
+.composer-submit :deep(.model-trigger) {
+  max-width: 210px;
+  min-height: 36px;
+  height: 36px;
+  padding: 6px 8px;
+  font-size: 11px;
+  > svg:first-child {
+    display: none;
+  }
+}
+.creation-options {
+  display: grid;
+  grid-template-columns: 1.3fr 0.8fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 18px 7px 8px;
+  border-top: 1px solid var(--border);
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  input {
+    width: 100%;
+    min-width: 0;
+    height: 37px;
+    padding: 8px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text);
+    font-size: 12px;
+  }
+  :deep(.studio-select) {
+    min-height: 37px;
+    font-size: 11px;
+  }
+}
+.creation-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--subtle);
+  font-size: 11px;
+  line-height: 1.7;
+}
+@media (max-width: 700px) {
+  .start-landing {
+    padding: 16px 14px;
+  }
+  .start-welcome {
+    min-height: 200px;
+    padding: 24px 0 36px;
+  }
+  .start-composer {
+    padding: 16px 10px 10px;
+    border-radius: 18px;
+    > textarea {
+      font-size: 14px;
+      min-height: 120px;
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+  }
+  .composer-controls {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .composer-tools {
+    gap: 1px;
+  }
+  .options-button {
+    font-size: 10px;
+    padding: 0 6px;
+    gap: 5px;
+  }
+  .options-summary {
+    display: none;
+  }
+  .composer-submit {
+    flex: 1;
+    justify-content: flex-end;
+    gap: 4px;
+    :deep(.model-trigger) {
+      max-width: 146px;
+      font-size: 10px;
+      padding: 4px;
+    }
+  }
+  .attach-button,
+  .options-button {
+    height: 40px;
+  }
+  .creation-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px 6px 6px;
+    gap: 16px 12px;
+    input {
+      height: 40px;
+    }
+    :deep(.studio-select) {
+      min-height: 40px;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .start-composer {
+    transition: none;
+  }
+}

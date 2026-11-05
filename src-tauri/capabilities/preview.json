@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "preview",
+  "description": "Local preview windows may save exported artifacts to a user-selected file.",
+  "windows": ["preview-*"],
+  "permissions": ["core:default", "dialog:allow-save", "fs:allow-write-file"]
+}

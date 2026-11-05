@@ -1,0 +1,18 @@
+[package]
+name = "agent-studio-desktop"
+version = "0.1.0"
+description = "Forge desktop shell"
+edition = "2021"
+rust-version = "1.88"
+
+[lib]
+name = "agent_studio_desktop"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "=2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "=2.11.5", features = [] }
+tauri-plugin-dialog = "=2.7.1"
+tauri-plugin-fs = "=2.5.1"

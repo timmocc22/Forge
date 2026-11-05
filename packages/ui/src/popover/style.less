@@ -1,0 +1,23 @@
+.studio-popover {
+  display: inline-flex;
+  min-width: 0;
+  vertical-align: middle;
+}
+.studio-popover-panel {
+  position: fixed;
+  z-index: 1000;
+  padding: 6px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--background);
+  color: var(--text);
+  box-shadow:
+    0 12px 40px #0002,
+    0 2px 8px #0001;
+  outline: none;
+}
+:global([data-theme='dark']) .studio-popover-panel {
+  box-shadow: 0 16px 48px #0006;
+}

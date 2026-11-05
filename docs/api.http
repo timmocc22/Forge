@@ -1,0 +1,40 @@
+@base = http://127.0.0.1:3007
+@project = 00000000-0000-4000-8000-000000000000
+
+### 健康状态，不返回密钥
+GET {{base}}/api/health
+
+### HTML 文本模型目录
+GET {{base}}/api/providers
+
+### 创建 HTML 项目；返回 201；替换 requestId 后提交
+POST {{base}}/api/html-projects
+Content-Type: application/json
+
+{
+  "requestId": "00000000-0000-4000-8000-000000000001",
+  "brief": "介绍人工智能如何帮助创作者组织灵感",
+  "audience": "普通读者",
+  "sceneCount": 5,
+  "style": "minimal",
+  "aspect": "landscape"
+}
+
+### 作品列表，仅含摘要
+GET {{base}}/api/html-projects
+
+### 将 project 替换成创建返回的 id
+GET {{base}}/api/html-projects/{{project}}
+
+### 规划分镜；expectedRevision 必须使用最新项目版本
+POST {{base}}/api/html-projects/{{project}}/runs
+Content-Type: application/json
+
+{
+  "requestId": "00000000-0000-4000-8000-000000000002",
+  "expectedRevision": 0,
+  "action": "plan"
+}
+
+### 停止生成，保留已完成页面
+POST {{base}}/api/html-projects/{{project}}/cancel

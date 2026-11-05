@@ -1,0 +1,107 @@
+// Adapted from vinodjangid07's Uiverse button. See docs/licenses/uiverse-send-button.md.
+.send-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 50%;
+  background: #a94722;
+  color: #fff;
+  box-shadow: 0 0 0 3px #e8784426;
+  cursor: pointer;
+  transition:
+    width 0.3s,
+    border-radius 0.3s,
+    background-color 0.3s,
+    box-shadow 0.3s;
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 5px;
+  }
+
+  &:disabled {
+    opacity: 1;
+    background: var(--field);
+    color: var(--on-disabled);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    background: #8c371b;
+  }
+}
+.send-icon {
+  width: 16px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
+}
+.send-label {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .send-button:hover:not(:disabled) {
+    width: 96px;
+    border-radius: 24px;
+    background: #bd5129;
+    box-shadow: 0 0 0 3px #e8784433;
+
+    .send-icon {
+      opacity: 0;
+      transform: translateY(-200%);
+    }
+    .send-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+.send-button:focus-visible:not(:disabled) {
+  width: 96px;
+  border-radius: 24px;
+
+  .send-icon {
+    opacity: 0;
+    transform: translateY(-200%);
+  }
+  .send-label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (pointer: coarse) {
+  .send-button {
+    width: 44px;
+    height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .send-button,
+  .send-icon,
+  .send-label {
+    transition: none;
+  }
+}

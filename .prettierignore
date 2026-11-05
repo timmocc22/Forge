@@ -1,0 +1,11 @@
+node_modules
+dist
+pnpm-lock.yaml
+.cache
+.nx
+.data
+coverage
+playwright-report
+test-results
+src-tauri/target
+src-tauri/gen

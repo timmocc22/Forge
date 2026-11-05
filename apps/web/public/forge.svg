@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#242424" />
+  <g transform="translate(4 4) scale(.875)">
+  <desc>Static frame of the shared GenerationOrb loading animation. Based on andrew-manzyk / young-walrus-64 (MIT). See third-party-licenses.txt.</desc>
+  <defs>
+    <linearGradient id="orb-shell" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#ffbf47" stop-opacity=".25" />
+      <stop offset="1" stop-color="#bf4a1d" stop-opacity=".5" />
+    </linearGradient>
+    <filter id="orb-glow" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="10" />
+    </filter>
+    <filter id="orb-shadow" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
+  </defs>
+  <g transform="translate(8 8) scale(.48)">
+    <circle cx="50" cy="50" r="48" fill="#ffbf47" opacity=".32" filter="url(#orb-glow)" />
+    <circle cx="50" cy="65" r="48" fill="#bf4a1d" opacity=".3" filter="url(#orb-shadow)" />
+    <circle cx="50" cy="50" r="50" fill="url(#orb-shell)" />
+    <path d="M0 50A50 50 0 0 1 100 50" stroke="#ffbf48" />
+    <path d="M0 50A50 50 0 0 0 100 50" stroke="#be4a1d" />
+    <svg overflow="visible" width="100" height="100" viewBox="0 0 100 100" focusable="false"><defs><filter id="generation-blur-brand" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="7"></feGaussianBlur></filter><filter id="generation-contrast-brand" x="0" y="0" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="15 0 0 0 -7 0 15 0 0 -7 0 0 15 0 -7 0 0 0 1 0"></feColorMatrix></filter><linearGradient id="generation-colors-brand" x1="0" y1="0" x2="0" y2="1"><stop offset="30%" stop-color="#ffbf48"></stop><stop offset="70%" stop-color="#be4a1d"></stop></linearGradient><!-- Keep the mask and its fill in one SVG for WebKit and scaled instances. --><mask id="generation-lava-brand" x="0" y="0" width="100" height="100" maskUnits="userSpaceOnUse" mask-type="luminance"><g class="lava-mask" filter="url(#generation-contrast-brand)"><polygon points="0,0 100,0 100,100 0,100" fill="black" filter="url(#generation-blur-brand)" transform="translate(75 25) matrix(0, 1, -1, 0, 0, 0) translate(-75 -25)"></polygon><polygon class="lava-shape" points="25,25 75,25 50,75" fill="white" filter="url(#generation-blur-brand)" transform="translate(50 50) matrix(-0.809624, 0.586949, -0.586949, -0.809624, 0, 0) translate(-50 -50)"></polygon><polygon class="lava-shape" points="50,25 75,75 25,75" fill="white" filter="url(#generation-blur-brand)" transform="translate(50 60) matrix(0.913125, -0.407681, 0.407681, 0.913125, 0, 0) translate(-50 -60)"></polygon><polygon class="lava-shape" points="35,35 65,35 50,65" fill="white" filter="url(#generation-blur-brand)" transform="translate(40 40) matrix(-0.809624, 0.586949, -0.586949, -0.809624, 0, 0) translate(-40 -40)"></polygon><polygon class="lava-shape" points="35,35 65,35 50,65" fill="white" filter="url(#generation-blur-brand)" transform="translate(40 40) matrix(0.809624, -0.586949, 0.586949, 0.809624, 0, 0) translate(-40 -40)"></polygon><polygon class="lava-shape" points="35,35 65,35 50,65" fill="white" filter="url(#generation-blur-brand)" transform="translate(60 40) matrix(-0.809624, -0.586949, 0.586949, -0.809624, 0, 0) translate(-60 -40)"></polygon><polygon class="lava-shape" points="35,35 65,35 50,65" fill="white" filter="url(#generation-blur-brand)" transform="translate(60 40) matrix(-0.1035, 0.994629, -0.994629, -0.1035, 0, 0) translate(-60 -40)"></polygon></g></mask></defs><rect class="lava-fill" width="100" height="100" fill="url(#generation-colors-brand)" mask="url(#generation-lava-brand)"></rect></svg>
+  </g>
+</g>
+</svg>

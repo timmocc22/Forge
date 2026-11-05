@@ -1,0 +1,62 @@
+.text-loading {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 140px;
+  max-width: 100%;
+  min-height: 44px;
+  margin: 8px 0;
+  padding: 8px 0;
+  isolation: isolate;
+}
+
+.text-loading-spectrum {
+  position: absolute;
+  inset: 0 -12px;
+  overflow: hidden;
+  pointer-events: none;
+  mask: repeating-linear-gradient(90deg, transparent 0 5px, #000 6px 7px);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 50% 50%, #ffc75e 0%, transparent 55%),
+      radial-gradient(ellipse at 35% 45%, #ee77a7 0%, transparent 50%),
+      radial-gradient(ellipse at 65% 55%, #63dce6 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, #9675ed 0%, transparent 65%);
+    mask: radial-gradient(ellipse at center, transparent 8%, #000 65%);
+    animation:
+      text-loading-sweep 2s infinite alternate cubic-bezier(0.6, 0.8, 0.5, 1),
+      text-loading-glow 4s infinite;
+  }
+}
+
+@keyframes text-loading-sweep {
+  from {
+    transform: translateX(-55%);
+  }
+  to {
+    transform: translateX(55%);
+  }
+}
+
+@keyframes text-loading-glow {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-loading-spectrum::after {
+    animation: none;
+    opacity: 0.55;
+  }
+}
