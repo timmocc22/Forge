@@ -12,7 +12,9 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 import {
-  askHtmlSceneSchema, enqueueProjectCommandSchema, projectCommandSchema,
+  askHtmlSceneSchema,
+  enqueueProjectCommandSchema,
+  projectCommandSchema,
   createHtmlProjectSchema,
   runHtmlProjectSchema,
   saveHtmlProjectSchema,
@@ -28,7 +30,9 @@ export class HtmlProjectController {
     @Inject(ConversationService) private readonly conversations: ConversationService,
     @Inject(ProjectCommands) private readonly commands: ProjectCommands,
   ) {}
-  @Get('storage/status') storageStatus() { return this.projects.storageStatus(); }
+  @Get('storage/status') storageStatus() {
+    return this.projects.storageStatus();
+  }
   @Get() list() {
     return this.projects.list();
   }
@@ -42,19 +46,33 @@ export class HtmlProjectController {
     return this.projects.save(id, saveHtmlProjectSchema.parse(body));
   }
   @Get(':id/commands')
-  queue(@Param('id', ParseUUIDPipe) id: string) { return this.commands.list(id); }
+  queue(@Param('id', ParseUUIDPipe) id: string) {
+    return this.commands.list(id);
+  }
   @Post(':id/commands')
   @HttpCode(202)
   enqueue(@Param('id', ParseUUIDPipe) id: string, @Body() body: unknown) {
-    return this.commands.enqueue(id, projectCommandSchema.parse(enqueueProjectCommandSchema.parse(body)));
+    return this.commands.enqueue(
+      id,
+      projectCommandSchema.parse(enqueueProjectCommandSchema.parse(body)),
+    );
   }
   @Patch(':id/commands/:commandId')
-  changeCommand(@Param('id', ParseUUIDPipe) id: string, @Param('commandId', ParseUUIDPipe) commandId: string, @Body() body: unknown) {
-    const { action } = z.object({ action: z.enum(['remove', 'retry', 'interrupt']) }).strict().parse(body);
+  changeCommand(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('commandId', ParseUUIDPipe) commandId: string,
+    @Body() body: unknown,
+  ) {
+    const { action } = z
+      .object({ action: z.enum(['remove', 'retry', 'interrupt']) })
+      .strict()
+      .parse(body);
     return this.commands.change(id, commandId, action);
   }
   @Delete(':id/commands')
-  clearCommands(@Param('id', ParseUUIDPipe) id: string) { return this.commands.clear(id); }
+  clearCommands(@Param('id', ParseUUIDPipe) id: string) {
+    return this.commands.clear(id);
+  }
   @Post(':id/archive')
   archive(@Param('id', ParseUUIDPipe) id: string, @Body() body: unknown) {
     const input = z

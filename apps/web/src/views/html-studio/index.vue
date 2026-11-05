@@ -155,7 +155,9 @@ function currentTask(): ActiveTask | undefined {
       allowEdits: true,
       multiStep: false,
     };
-  const sending = projectMessages.value.find((message) => message.id === processingMessage.value);
+  const sending =
+    projectMessages.value.find((message) => message.id === processingMessage.value) ??
+    projectMessages.value.find((message) => message.status === 'queued');
   if (sending)
     return {
       action: 'conversation',
@@ -172,7 +174,9 @@ const hasActiveTask = computed(
     project.value?.run?.status === 'awaiting_input' ||
     conversation.value?.pending?.status === 'running',
 );
-const processingMessage = computed(() => queuedMessages.value.find((message) => message.status === 'running')?.id ?? '');
+const processingMessage = computed(
+  () => queuedMessages.value.find((message) => message.status === 'running')?.id ?? '',
+);
 const projectMessages = computed(() =>
   queuedMessages.value.filter((message) => message.projectId === project.value?.id),
 );
@@ -516,29 +520,45 @@ async function submitAgent() {
       ? 'plan'
       : 'message') as 'plan' | 'message',
     append: busy.value || running.value || projectMessages.value.length > 0,
-    error: '',
     task,
     timing: 'after' as const,
   };
+  const draft = instruction.value;
+  instruction.value = '';
   try {
-    const { error: _error, ...command } = message;
-    await studio.enqueue(command);
-    instruction.value = '';
-  } catch (cause) { error.value = cause instanceof Error ? cause.message : '发送失败'; }
+    if (awaitingGenerationInput.value && !projectMessages.value.length) {
+      await answerGeneration(question);
+      if (error.value) throw new Error(error.value);
+    } else await studio.enqueue(message);
+  } catch (cause) {
+    if (!instruction.value) instruction.value = draft;
+    error.value = cause instanceof Error ? cause.message : '发送失败';
+  }
 }
 async function updateCommand(id: string, action: 'remove' | 'retry' | 'interrupt') {
-  try { await studio.changeCommand(id, action); }
-  catch (cause) { error.value = cause instanceof Error ? cause.message : '任务操作失败'; }
+  try {
+    await studio.changeCommand(id, action);
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : '任务操作失败';
+  }
 }
-function steerMessage(id: string) { void updateCommand(id, 'interrupt'); }
-function removeMessage(id: string) { void updateCommand(id, 'remove'); }
+function steerMessage(id: string) {
+  void updateCommand(id, 'interrupt');
+}
+function removeMessage(id: string) {
+  void updateCommand(id, 'remove');
+}
 function restoreMessage(id: string) {
   const message = projectMessages.value.find((entry) => entry.id === id);
   if (!message || id === processingMessage.value) return;
-  instruction.value = instruction.value ? `${instruction.value}\n${message.question}` : message.question;
+  instruction.value = instruction.value
+    ? `${instruction.value}\n${message.question}`
+    : message.question;
   removeMessage(id);
 }
-function retryMessage(id: string) { void updateCommand(id, 'retry'); }
+function retryMessage(id: string) {
+  void updateCommand(id, 'retry');
+}
 
 async function exportHtml() {
   await studio.action(async () => {

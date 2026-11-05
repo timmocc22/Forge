@@ -30,11 +30,10 @@ export async function planCreativeProject(
       pageCount: content.scenes.length,
       design: content.creativeDirection?.design.slice(0, 500),
     }));
-  const messages =
-    recentTurns(conversation?.messages).map(({ role, content }) => ({
-      role,
-      content: content.slice(0, 2000),
-    }));
+  const messages = recentTurns(conversation?.messages).map(({ role, content }) => ({
+    role,
+    content: content.slice(0, 2000),
+  }));
   const result = modelSchema.parse(
     project.modelSelection.provider === 'demo'
       ? {

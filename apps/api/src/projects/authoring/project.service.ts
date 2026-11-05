@@ -49,12 +49,14 @@ export class HtmlProjectService {
     await Promise.allSettled(this.workers);
     await this.repository.idle();
   }
-  storageStatus() { return { issues: this.repository.diagnostics() }; }
+  storageStatus() {
+    return { issues: this.repository.diagnostics() };
+  }
   list() {
     return this.repository.list();
   }
   get(id: string) {
-    return this.repository.get(id).project;
+    return this.repository.read(id).project;
   }
   archive(id: string, archived: boolean, revision: number) {
     return this.repository.transaction(async (transaction) => {
@@ -258,8 +260,12 @@ export class HtmlProjectService {
       record.operations = [...record.operations, input.requestId].slice(-100);
       const runId = record.project.run.id;
       this.tasks.register(runId);
-      try { return await transaction.save(record); }
-      catch (error) { this.tasks.release(runId); throw error; }
+      try {
+        return await transaction.save(record);
+      } catch (error) {
+        this.tasks.release(runId);
+        throw error;
+      }
     });
     const run = project.run;
     if (!run || run.requestId !== input.requestId || run.status !== 'running') return project;

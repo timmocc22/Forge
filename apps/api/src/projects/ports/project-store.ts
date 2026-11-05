@@ -11,12 +11,20 @@ export interface ProjectTransaction {
 }
 export interface ProjectStore {
   initialize(): Promise<void>;
-  diagnostics(): { file: string; reason: string }[];
+  read(id: string): Pick<ProjectRecord, 'project' | 'conversation' | 'commands'>;
+  diagnostics(): { file: string; reason: string; recovered?: boolean }[];
   get(id: string): ProjectRecord;
   all(): ProjectRecord[];
   list(): {
-    id: string; title: string; brief: string; revision: number; sceneCount: number;
-    builtCount: number; updatedAt: string; archived: boolean; running: boolean;
+    id: string;
+    title: string;
+    brief: string;
+    revision: number;
+    sceneCount: number;
+    builtCount: number;
+    updatedAt: string;
+    archived: boolean;
+    running: boolean;
   }[];
   transaction<T>(operation: (transaction: ProjectTransaction) => Promise<T>): Promise<T>;
   idle(): Promise<void>;

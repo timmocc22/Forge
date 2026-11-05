@@ -42,7 +42,11 @@ export async function planGeneration(
         instruction: instruction || `根据已确认分镜生成「${scene.title}」。`,
       })),
     };
-  const messages = recentTurns(conversation?.messages).map(({ role, content, sceneId }) => ({ role, content, sceneId }));
+  const messages = recentTurns(conversation?.messages).map(({ role, content, sceneId }) => ({
+    role,
+    content,
+    sceneId,
+  }));
   const result = schema.parse(
     await provider.complete(
       project.modelSelection,

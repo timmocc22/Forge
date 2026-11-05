@@ -28,16 +28,18 @@ import { ProjectTasks } from './runtime/project-tasks.js';
     {
       provide: ProjectCommands,
       inject: [PROJECT_STORE, HtmlProjectService, ConversationService, ProjectTasks],
-      useFactory: (store: ProjectStore, projects: HtmlProjectService, conversations: ConversationService, tasks: ProjectTasks) => new ProjectCommands(store, projects, conversations, tasks),
+      useFactory: (
+        store: ProjectStore,
+        projects: HtmlProjectService,
+        conversations: ConversationService,
+        tasks: ProjectTasks,
+      ) => new ProjectCommands(store, projects, conversations, tasks),
     },
     {
       provide: HtmlProjectService,
       inject: [PROJECT_STORE, GENERATION_PROVIDER, ProjectTasks],
-      useFactory: (
-        repository: ProjectStore,
-        provider: GenerationGateway,
-        tasks: ProjectTasks,
-      ) => new HtmlProjectService(repository, provider, tasks),
+      useFactory: (repository: ProjectStore, provider: GenerationGateway, tasks: ProjectTasks) =>
+        new HtmlProjectService(repository, provider, tasks),
     },
     {
       provide: ConversationService,

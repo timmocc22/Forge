@@ -2,7 +2,9 @@ import { computed, onMounted, onUnmounted, ref, toRaw, watch } from 'vue';
 import { z } from 'zod';
 import {
   htmlProjectContentSchema,
-  type CreateHtmlProject, type ProjectCommand, type EnqueueProjectCommand,
+  type CreateHtmlProject,
+  type ProjectCommand,
+  type EnqueueProjectCommand,
   type AskHtmlScene,
   type Conversation,
   type HtmlProject,
@@ -47,6 +49,12 @@ export function useHtmlProjects() {
   let draftWrites: Promise<unknown> = Promise.resolve();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let disposed = false;
+  let polling = false;
+  let reconcileCommands = false;
+  function pollSoon() {
+    clearTimeout(timer);
+    timer = setTimeout(() => void poll(), 0);
+  }
   let activeReply: { id: string; controller: AbortController } | undefined;
   function accept(value: HtmlProject) {
     project.value = value;
@@ -173,7 +181,7 @@ export function useHtmlProjects() {
           project.value = undefined;
           content.value = undefined;
           conversation.value = undefined;
-      commands.value = [];
+          commands.value = [];
           history.replaceState(null, '', location.pathname);
         }
         await draftWrites;
@@ -337,35 +345,63 @@ export function useHtmlProjects() {
         const [value, transcript, queue] = await Promise.all([
           htmlProjectsApi.get(id),
           htmlProjectsApi.conversation(id),
-        htmlProjectsApi.commands(id),
+          htmlProjectsApi.commands(id),
         ]);
         accept(value);
         conversation.value = transcript;
-      commands.value = queue;
+        commands.value = queue;
       }
       await refreshList();
       await models.refresh();
     });
   }
   async function enqueue(command: EnqueueProjectCommand) {
+    const modelSelection = command.modelSelection ?? models.selectionFor('html');
     await save();
     if (dirty.value) throw new Error('保存期间内容发生变化，请保存后再发送');
-    const queue = await htmlProjectsApi.enqueue(command.projectId, { ...command, modelSelection: models.selectionFor('html') });
+    let queue: ProjectCommand[];
+    try {
+      queue = await htmlProjectsApi.enqueue(command.projectId, {
+        ...command,
+        modelSelection,
+      });
+    } catch (cause) {
+      // Losing the acknowledgement does not cancel a durable command.
+      const [pending, transcript] = await Promise.all([
+        htmlProjectsApi.commands(command.projectId),
+        htmlProjectsApi.conversation(command.projectId),
+      ]);
+      if (
+        !pending.some((item) => item.id === command.id) &&
+        !transcript.messages.some((item) => item.id === command.id)
+      )
+        throw cause;
+      queue = pending;
+      if (project.value?.id === command.projectId) conversation.value = transcript;
+    }
     if (project.value?.id === command.projectId) commands.value = queue;
+    reconcileCommands = true;
+    pollSoon();
   }
   async function changeCommand(commandId: string, operation: 'remove' | 'retry' | 'interrupt') {
     if (!project.value) return;
     const id = project.value.id;
     const queue = await htmlProjectsApi.changeCommand(id, commandId, operation);
     if (project.value?.id === id) commands.value = queue;
+    reconcileCommands = true;
+    pollSoon();
   }
   async function clearCommands() {
     if (!project.value) return;
     const id = project.value.id;
     const queue = await htmlProjectsApi.clearCommands(id);
     if (project.value?.id === id) commands.value = queue;
+    reconcileCommands = true;
+    pollSoon();
   }
   async function poll() {
+    if (polling || disposed) return;
+    polling = true;
     try {
       if (project.value) {
         const id = project.value.id;
@@ -373,10 +409,15 @@ export function useHtmlProjects() {
         const queue = await htmlProjectsApi.commands(id);
         if (project.value?.id === id) {
           commands.value = queue;
-          if ((previousQueue || queue.length) && !dirty.value && !busy.value) {
-            const [value, transcript] = await Promise.all([htmlProjectsApi.get(id), htmlProjectsApi.conversation(id)]);
+          if ((previousQueue || queue.length || reconcileCommands) && !dirty.value && !busy.value) {
+            const [value, transcript] = await Promise.all([
+              htmlProjectsApi.get(id),
+              htmlProjectsApi.conversation(id),
+            ]);
             if (project.value?.id === id && !dirty.value && !busy.value) {
-              accept(value); conversation.value = transcript;
+              accept(value);
+              conversation.value = transcript;
+              if (!queue.length) reconcileCommands = false;
             }
             await refreshList();
           }
@@ -405,12 +446,17 @@ export function useHtmlProjects() {
       connected.value = false;
       handle(cause);
     } finally {
+      polling = false;
       if (!disposed)
         timer = setTimeout(
           () => {
             void poll();
           },
-          running.value || commands.value.length || conversation.value?.pending?.status === 'running' ? 750 : 5000,
+          running.value ||
+            commands.value.length ||
+            conversation.value?.pending?.status === 'running'
+            ? 750
+            : 5000,
         );
     }
   }
@@ -441,10 +487,24 @@ export function useHtmlProjects() {
   onMounted(async () => {
     loading.value = true;
     try {
-      const [, , storage] = await Promise.all([refreshList(), models.refresh(), htmlProjectsApi.storageStatus()]);
-      if (storage.issues.length) notice.value = `${storage.issues.length} 件作品无法读取，其原文件已保留。其余作品可继续使用。`;
+      const [, , storage] = await Promise.all([
+        refreshList(),
+        models.refresh(),
+        htmlProjectsApi.storageStatus(),
+      ]);
       const id = location.hash.match(/^#(?:project|works)\/([\da-f-]{36})$/)?.[1];
       if (id) await open(id);
+      if (storage.issues.length) {
+        const recovered = storage.issues.filter((issue) => issue.recovered).length;
+        const unavailable = storage.issues.length - recovered;
+        notice.value = [
+          notice.value,
+          unavailable ? `${unavailable} 件作品无法读取，原文件已保留。` : '',
+          recovered ? `${recovered} 件作品已从备份恢复，请核对最近修改。` : '',
+        ]
+          .filter(Boolean)
+          .join('');
+      }
     } catch (cause) {
       connected.value = false;
       handle(cause);
@@ -462,7 +522,10 @@ export function useHtmlProjects() {
   });
   return {
     projects,
-    commands, enqueue, changeCommand, clearCommands,
+    commands,
+    enqueue,
+    changeCommand,
+    clearCommands,
     conversation,
     project,
     content,

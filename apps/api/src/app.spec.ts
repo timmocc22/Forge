@@ -3,7 +3,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Test } from '@nestjs/testing';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import type { INestApplication } from '@nestjs/common';
 import { AppModule } from './app.module.js';
@@ -64,6 +64,45 @@ describe('Nest HTTP contract', () => {
       .post(`${path}/runs`)
       .send({ action: 'scene', expectedRevision: -1, requestId: crypto.randomUUID() })
       .expect(400);
+  });
+  it('accepts durable commands and returns their committed result through the HTTP API', async () => {
+    const server = app.getHttpServer();
+    const created = await request(server)
+      .post('/api/html-projects')
+      .send({
+        requestId: crypto.randomUUID(),
+        brief: 'Durable HTTP queue',
+        sourceHtml: '<html><body>Page</body></html>',
+      })
+      .expect(201);
+    const path = `/api/html-projects/${created.body.id}`;
+    const command = {
+      id: crypto.randomUUID(),
+      projectId: created.body.id,
+      sceneId: created.body.content.scenes[0].id,
+      question: '解释这一页',
+      mode: 'ask',
+      kind: 'message',
+      append: false,
+      timing: 'after',
+    };
+    await request(server).post(`${path}/commands`).send(command).expect(202);
+    await vi.waitFor(async () => {
+      const queue = await request(server).get(`${path}/commands`).expect(200);
+      expect(queue.body).toEqual([]);
+    });
+    const transcript = await request(server).get(`${path}/conversation`).expect(200);
+    expect(transcript.body.messages[0].id).toBe(command.id);
+    expect(transcript.body.messages[1].content).toContain('未调用 AI');
+    await request(server).post(`${path}/commands`).send(command).expect(202);
+    expect((await request(server).get(`${path}/conversation`)).body.messages).toHaveLength(2);
+    await request(server)
+      .post(`${path}/commands`)
+      .send({ ...command, projectId: crypto.randomUUID() })
+      .expect(409);
+    expect(
+      (await request(server).get('/api/html-projects/storage/status').expect(200)).body,
+    ).toEqual({ issues: [] });
   });
   it('validates read-only page questions and explicitly labels demo answers', async () => {
     const server = app.getHttpServer();

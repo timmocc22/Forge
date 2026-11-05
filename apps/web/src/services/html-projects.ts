@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import {
-  askHtmlSceneResponseSchema, projectCommandsSchema, type EnqueueProjectCommand,
+  askHtmlSceneResponseSchema,
+  projectCommandsSchema,
+  type EnqueueProjectCommand,
   conversationSchema,
   type AskHtmlScene,
   htmlProjectSchema,
@@ -42,11 +44,21 @@ async function request(
   return result;
 }
 export const htmlProjectsApi = {
-  storageStatus: async () => z.object({ issues: z.array(z.object({ file: z.string(), reason: z.string() })) }).parse(await request('/storage/status')),
+  storageStatus: async () =>
+    z
+      .object({
+        issues: z.array(
+          z.object({ file: z.string(), reason: z.string(), recovered: z.boolean().optional() }),
+        ),
+      })
+      .parse(await request('/storage/status')),
   commands: async (id: string) => projectCommandsSchema.parse(await request(`/${id}/commands`)),
-  enqueue: async (id: string, command: EnqueueProjectCommand) => projectCommandsSchema.parse(await request(`/${id}/commands`, 'POST', command)),
-  changeCommand: async (id: string, commandId: string, action: 'remove' | 'retry' | 'interrupt') => projectCommandsSchema.parse(await request(`/${id}/commands/${commandId}`, 'PATCH', { action })),
-  clearCommands: async (id: string) => projectCommandsSchema.parse(await request(`/${id}/commands`, 'DELETE')),
+  enqueue: async (id: string, command: EnqueueProjectCommand) =>
+    projectCommandsSchema.parse(await request(`/${id}/commands`, 'POST', command)),
+  changeCommand: async (id: string, commandId: string, action: 'remove' | 'retry' | 'interrupt') =>
+    projectCommandsSchema.parse(await request(`/${id}/commands/${commandId}`, 'PATCH', { action })),
+  clearCommands: async (id: string) =>
+    projectCommandsSchema.parse(await request(`/${id}/commands`, 'DELETE')),
   list: async () => z.array(projectSummarySchema).parse(await request()),
   archive: async (id: string, archived: boolean, expectedRevision: number) =>
     htmlProjectSchema.parse(

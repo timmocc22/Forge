@@ -1,4 +1,8 @@
-import { ContextService, recentTurns, type ContextDocument } from '../../context/context.service.js';
+import {
+  ContextService,
+  recentTurns,
+  type ContextDocument,
+} from '../../context/context.service.js';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   BadRequestException,
@@ -35,7 +39,7 @@ export class ConversationService {
     await this.repository.idle();
   }
   get(id: string): Conversation {
-    const record = this.repository.get(id);
+    const record = this.repository.read(id);
     return structuredClone(record.conversation ?? { id, projectId: id, messages: [] });
   }
   private readonly asking = new Set<string>();
@@ -119,9 +123,16 @@ export class ConversationService {
     ]);
     let evidence: ContextDocument[] | undefined;
     const provider = {
-      complete: (selection: Parameters<GenerationGateway['complete']>[0], request: Parameters<GenerationGateway['complete']>[1], _signal: AbortSignal) =>
+      complete: (
+        selection: Parameters<GenerationGateway['complete']>[0],
+        request: Parameters<GenerationGateway['complete']>[1],
+        _signal: AbortSignal,
+      ) =>
         abortable(signal, async () => {
-          evidence ??= await this.context.retrieve({ projectId: id, query: input.question, sceneId: scene.id, taskId: requestId }, signal);
+          evidence ??= await this.context.retrieve(
+            { projectId: id, query: input.question, sceneId: scene.id, taskId: requestId },
+            signal,
+          );
           return this.provider.complete(selection, this.context.enrich(request, evidence), signal);
         }),
     };
@@ -132,13 +143,25 @@ export class ConversationService {
       modelSelection,
       signal,
     );
-    const fingerprint = createHash('sha256').update(JSON.stringify({
-      question: input.question, sceneId: input.sceneId, allowEdits: input.allowEdits ?? true,
-      multiStep: input.multiStep ?? false, continuation: input.continuation, modelSelection,
-    })).digest('hex');
-    const checkpoint = input.multiStep && initial.checkpoint?.requestId === requestId &&
-      initial.checkpoint.fingerprint === fingerprint && initial.checkpoint.baseRevision === project.revision
-      ? initial.checkpoint : undefined;
+    const fingerprint = createHash('sha256')
+      .update(
+        JSON.stringify({
+          question: input.question,
+          sceneId: input.sceneId,
+          allowEdits: input.allowEdits ?? true,
+          multiStep: input.multiStep ?? false,
+          continuation: input.continuation,
+          modelSelection,
+        }),
+      )
+      .digest('hex');
+    const checkpoint =
+      input.multiStep &&
+      initial.checkpoint?.requestId === requestId &&
+      initial.checkpoint.fingerprint === fingerprint &&
+      initial.checkpoint.baseRevision === project.revision
+        ? initial.checkpoint
+        : undefined;
     if (checkpoint) {
       evidence = checkpoint.evidence;
       tools.project.content = structuredClone(checkpoint.content);
@@ -182,8 +205,12 @@ export class ConversationService {
                 )
                   throw new ConflictException('任务已停止');
                 record.checkpoint = {
-                  requestId, fingerprint, evidence, baseRevision: project.revision,
-                  draftRevision: tools.project.revision, content: structuredClone(tools.project.content),
+                  requestId,
+                  fingerprint,
+                  evidence,
+                  baseRevision: project.revision,
+                  draftRevision: tools.project.revision,
+                  content: structuredClone(tools.project.content),
                   task: structuredClone(task),
                 };
                 record.conversation.pending.task = structuredClone(task);

@@ -1352,18 +1352,22 @@ describe('multi-step page tasks', () => {
       });
       // A changed base replans; an unchanged base reuses the completed page checkpoint.
       if (kind === 'conflict') {
-        provider.complete.mockResolvedValueOnce({ steps: [{ sceneId: first!.id, instruction: '补充示例' }] });
+        provider.complete.mockResolvedValueOnce({
+          steps: [{ sceneId: first!.id, instruction: '补充示例' }],
+        });
         provider.complete.mockResolvedValueOnce({ ...fields, content: '重试成功' });
       } else {
         provider.complete.mockResolvedValueOnce({ ...pageFields(second!), content: '重试成功' });
       }
       const calls = provider.complete.mock.calls.length;
       const result = await conversations.ask(plan.id, {
-        ...input, expectedRevision: service.get(plan.id).revision,
+        ...input,
+        expectedRevision: service.get(plan.id).revision,
       });
       expect(result.project!.content.scenes[kind === 'conflict' ? 0 : 1]!.content).toBe('重试成功');
       expect(provider.complete.mock.calls.length - calls).toBe(kind === 'conflict' ? 2 : 1);
-      if (kind !== 'conflict') expect(result.project!.content.scenes[0]!.content).toBe('暂存的新内容');
+      if (kind !== 'conflict')
+        expect(result.project!.content.scenes[0]!.content).toBe('暂存的新内容');
       expect(result.conversation.pending).toBeUndefined();
     },
   );
@@ -1585,5 +1589,91 @@ describe('default generation tasks', () => {
       allowEdits: false,
     });
     expect(resumed.answer).toBe('可以继续交流。');
+  });
+});
+
+describe('durable writer checkpoints and isolated drafts', () => {
+  const pageFields = (scene: HtmlProject['content']['scenes'][number]) => ({
+    title: scene.title,
+    objective: scene.objective,
+    content: scene.content,
+    layout: scene.layout,
+    html: scene.html,
+  });
+  it('resumes a multi-step draft across restart without planning or rewriting the completed page', async () => {
+    const { service, conversations, project, provider, directory, repository } = await fixture();
+    const plan = await planned(service, project);
+    const [first, second] = plan.content.scenes;
+    provider.complete.mockResolvedValueOnce({
+      steps: [first!, second!].map((scene) => ({ sceneId: scene.id, instruction: '补充示例' })),
+    });
+    provider.complete.mockResolvedValueOnce({ ...pageFields(first!), content: '已完成的第一步' });
+    provider.complete.mockRejectedValueOnce(new Error('interrupted'));
+    const input = {
+      requestId: randomUUID(),
+      expectedRevision: plan.revision,
+      sceneId: first!.id,
+      question: '补充示例',
+      multiStep: true,
+    };
+    await expect(conversations.ask(plan.id, input)).rejects.toThrow();
+    expect(repository.get(plan.id).checkpoint?.task.steps[0]?.status).toBe('succeeded');
+    expect(service.get(plan.id).content).toEqual(plan.content);
+    const reopened = await setup(directory, provider);
+    provider.complete.mockResolvedValueOnce({ ...pageFields(second!), content: '恢复后的第二步' });
+    const calls = provider.complete.mock.calls.length;
+    const result = await reopened.conversations.ask(plan.id, input);
+    expect(provider.complete.mock.calls.length - calls).toBe(1);
+    expect(result.project!.content.scenes.slice(0, 2).map((scene) => scene.content)).toEqual([
+      '已完成的第一步',
+      '恢复后的第二步',
+    ]);
+    expect(reopened.repository.get(plan.id).checkpoint).toBeUndefined();
+    expect((await reopened.service.undo(plan.id, result.revision, randomUUID())).content).toEqual(
+      plan.content,
+    );
+  });
+  it('merges an isolated writer draft with a concurrent edit to a different page', async () => {
+    const { service, conversations, project, provider } = await fixture();
+    const plan = await planned(service, project);
+    const [first, second] = plan.content.scenes;
+    let release!: (value: unknown) => void;
+    provider.complete.mockImplementationOnce(async (_selection, request) => {
+      await request.tools!.execute(
+        'revise_scene',
+        JSON.stringify({
+          sceneId: first!.id,
+          expectedRevision: plan.revision,
+          instruction: '修改第一页',
+        }),
+      );
+      return { answer: '已修改' };
+    });
+    provider.complete.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = resolve;
+        }),
+    );
+    const work = conversations.ask(plan.id, {
+      expectedRevision: plan.revision,
+      sceneId: first!.id,
+      question: '修改第一页',
+    });
+    await vi.waitFor(() => expect(release).toBeTypeOf('function'));
+    const manual = structuredClone(plan.content);
+    manual.scenes[1]!.content = '另一位作者的修改';
+    await service.save(plan.id, {
+      expectedRevision: plan.revision,
+      operationId: randomUUID(),
+      content: manual,
+    });
+    release({ ...pageFields(first!), content: 'Agent 的修改' });
+    const result = await work;
+    expect(result.project!.content.scenes[0]!.content).toBe('Agent 的修改');
+    expect(result.project!.content.scenes.find((scene) => scene.id === second!.id)!.content).toBe(
+      '另一位作者的修改',
+    );
+    expect(result.revision).toBeGreaterThan(plan.revision + 1);
   });
 });

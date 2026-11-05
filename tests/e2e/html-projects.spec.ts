@@ -1,3 +1,4 @@
+import { mockCommandWorker } from './command-worker-fixture';
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import type { AskHtmlScene, HtmlProject } from '@studio/contracts';
@@ -33,6 +34,11 @@ for (const mode of ['option', 'manual', 'delegate'] as const) {
       expect(input.action).toBe('plan');
       if (++attempts > 1) {
         expect(input.instruction).toContain(mode === 'delegate' ? '自行判断' : '小学生');
+        if (mode === 'manual' && attempts === 2)
+          return route.fulfill({
+            status: 503,
+            json: { error: { message: '暂时无法继续，请重试' } },
+          });
         return route.continue();
       }
       const current: HtmlProject = await (
@@ -71,6 +77,8 @@ for (const mode of ['option', 'manual', 'delegate'] as const) {
     if (mode === 'manual') {
       await page.getByLabel('补充你的选择', { exact: true }).fill('给小学生讲解');
       await page.getByRole('button', { name: '发送创作要求并重新规划', exact: true }).click();
+      await expect(page.getByLabel('补充你的选择', { exact: true })).toHaveValue('给小学生讲解');
+      await page.getByRole('button', { name: '发送创作要求并重新规划', exact: true }).click();
     } else {
       await page
         .getByRole('button', { name: mode === 'option' ? '学生课堂' : '交给 AI 判断', exact: true })
@@ -80,13 +88,14 @@ for (const mode of ['option', 'manual', 'delegate'] as const) {
     await expect(page.getByLabel('生成前确认')).toHaveCount(0);
     await expect(page.getByLabel('创作方案')).toBeVisible();
     await expect(page.locator('.conversation-request')).toContainText('介绍分数的意义');
-    expect(attempts).toBe(2);
+    expect(attempts).toBe(mode === 'manual' ? 3 : 2);
   });
 }
 
 test('failed storyboard allows editing the brief and retrying without a selected scene', async ({
   page,
 }, testInfo) => {
+  await mockCommandWorker(page);
   let attempts = 0;
   await page.route('**/api/html-projects/*/runs', async (route) => {
     attempts++;
@@ -653,6 +662,7 @@ test('unchanged preview stays loaded when generation starts, polls and stops', a
   page,
   request,
 }) => {
+  await mockCommandWorker(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   const result = await request.post('/api/html-projects', {
     data: {
@@ -753,6 +763,7 @@ test('generation feedback follows planning, progress, completion, cancellation a
   page,
   request,
 }, testInfo) => {
+  await mockCommandWorker(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ colorScheme: 'dark' });
   const result = await request.post('/api/html-projects', {
@@ -990,6 +1001,7 @@ test('ask current page returns advice, allows locked pages, retries errors and l
   page,
   request,
 }, testInfo) => {
+  await mockCommandWorker(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   const created = await request.post('/api/html-projects', {
     data: {
@@ -1187,6 +1199,7 @@ test('unified assistant refreshes cross-page tool edits, keeps selected page and
   page,
   request,
 }, testInfo) => {
+  await mockCommandWorker(page);
   const original = await (
     await request.post('/api/html-projects', {
       data: {
@@ -1376,6 +1389,12 @@ test('restores a running conversation after reload, stops it and resumes the ori
     transcript.pending.error = '回复已停止，可继续回复';
     return route.fulfill({ json: transcript });
   });
+  await page.route(`**${path}/commands`, async (route) => {
+    if (route.request().method() !== 'DELETE') return route.continue();
+    transcript.pending!.status = 'interrupted';
+    transcript.pending!.error = '回复已停止，可继续回复';
+    await route.fulfill({ json: [] });
+  });
   await page.goto(`/#project/${project.id}`);
   await expect(page.getByRole('button', { name: '停止任务', exact: true })).toBeVisible();
   await page.reload();
@@ -1410,7 +1429,8 @@ test('recovers a committed reply when its HTTP response is lost', async ({ page,
   ).json();
   const path = `/api/html-projects/${project.id}`;
   await page.goto(`/#project/${project.id}`);
-  await page.route(`**${path}/questions`, async (route) => {
+  await page.route(`**${path}/commands`, async (route) => {
+    if (route.request().method() !== 'POST') return route.continue();
     await route.fetch();
     await route.abort('connectionreset');
   });
@@ -1425,6 +1445,7 @@ test('page conversation renders task results and Markdown after reload', async (
   page,
   request,
 }, testInfo) => {
+  await mockCommandWorker(page);
   const project: HtmlProject = await (
     await request.post('/api/html-projects', {
       data: {
@@ -1627,6 +1648,12 @@ test('multi-step progress survives reload and stopping offers an explicit full r
     transcript.pending!.error = '任务已停止';
     return route.fulfill({ json: transcript });
   });
+  await page.route(`**${path}/commands`, async (route) => {
+    if (route.request().method() !== 'DELETE') return route.continue();
+    transcript.pending!.status = 'interrupted';
+    transcript.pending!.error = '回复已停止，可继续回复';
+    await route.fulfill({ json: [] });
+  });
   await page.goto(`/#project/${project.id}`);
   await expect(page.getByLabel('多步任务进度')).toContainText('正在逐页执行');
   await page.reload();
@@ -1734,6 +1761,7 @@ test('composer clears immediately and sends appended questions in order without 
   page,
   request,
 }) => {
+  await mockCommandWorker(page);
   const created = await request.post('/api/html-projects', {
     data: {
       requestId: crypto.randomUUID(),
@@ -1828,6 +1856,7 @@ for (const timing of ['after', 'interrupt'] as const) {
     page,
     request,
   }, testInfo) => {
+    await mockCommandWorker(page);
     const project = await (
       await request.post('/api/html-projects', {
         data: {
@@ -1929,6 +1958,7 @@ test('interrupting generation continues remaining pages with the original goal a
   page,
   request,
 }, testInfo) => {
+  await mockCommandWorker(page);
   let project: HtmlProject = await (
     await request.post('/api/html-projects', {
       data: {
@@ -2002,4 +2032,46 @@ test('interrupting generation continues remaining pages with the original goal a
   const saved = await (await request.get(`/api/html-projects/${project.id}`)).json();
   expect(saved.content.scenes[0].html).toBe(firstHtml);
   expect(saved.content.scenes[1].html).toContain('使用更大的文字');
+});
+
+test('server commands finish without a browser owner and a refreshed composer does not duplicate work', async ({
+  page,
+  request,
+}) => {
+  const project: HtmlProject = await (
+    await request.post('/api/html-projects', {
+      data: {
+        requestId: crypto.randomUUID(),
+        brief: '服务端队列恢复',
+        sourceHtml: '<html><body>保存的页面</body></html>',
+      },
+    })
+  ).json();
+  const path = `/api/html-projects/${project.id}`;
+  const command = {
+    id: crypto.randomUUID(),
+    projectId: project.id,
+    question: '浏览器打开之前解释这一页',
+    sceneId: project.content.scenes[0]!.id,
+    kind: 'message',
+    mode: 'ask',
+    append: false,
+    timing: 'after',
+  };
+  expect((await request.post(`${path}/commands`, { data: command })).status()).toBe(202);
+  await expect
+    .poll(async () => (await (await request.get(`${path}/conversation`)).json()).messages.length)
+    .toBe(2);
+  await page.goto(`/#project/${project.id}`);
+  await expect(page.locator('.consultation-question').first()).toContainText(command.question);
+  await page.getByLabel('页面问题或修改要求', { exact: true }).fill('刷新后继续解释');
+  const acknowledgement = page.waitForResponse(
+    (response) => response.url().endsWith('/commands') && response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: '发送消息', exact: true }).click();
+  expect((await acknowledgement).status()).toBe(202);
+  await page.reload();
+  await expect(page.locator('.page-consultation')).toHaveCount(2);
+  await request.post(`${path}/commands`, { data: command });
+  expect((await (await request.get(`${path}/conversation`)).json()).messages).toHaveLength(4);
 });

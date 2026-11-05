@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { contextDocumentSchema } from '../../context/context.service.js';
-import { conversationSchema, htmlProjectSchema, htmlProjectContentSchema, multiStepTaskSchema, projectCommandsSchema } from '@studio/contracts';
+import {
+  conversationSchema,
+  htmlProjectSchema,
+  htmlProjectContentSchema,
+  multiStepTaskSchema,
+  projectCommandsSchema,
+} from '@studio/contracts';
 
 /** Internal execution data never appears in project/conversation HTTP responses. */
 export const executionCheckpointSchema = z.object({
@@ -23,8 +29,15 @@ export const projectRecordSchema = z
     operations: z.array(z.string().uuid()).max(100),
   })
   .superRefine(({ project, conversation, commands }, context) => {
-    if (commands?.some((command) => command.projectId !== project.id) || new Set(commands?.map((command) => command.id)).size !== (commands?.length ?? 0))
-      context.addIssue({ code: 'custom', path: ['commands'], message: '任务队列标识或项目归属不正确' });
+    if (
+      commands?.some((command) => command.projectId !== project.id) ||
+      new Set(commands?.map((command) => command.id)).size !== (commands?.length ?? 0)
+    )
+      context.addIssue({
+        code: 'custom',
+        path: ['commands'],
+        message: '任务队列标识或项目归属不正确',
+      });
     if (conversation && conversation.projectId !== project.id)
       context.addIssue({
         code: 'custom',
@@ -33,4 +46,3 @@ export const projectRecordSchema = z
       });
   });
 export type ProjectRecord = z.infer<typeof projectRecordSchema>;
-

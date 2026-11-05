@@ -62,6 +62,26 @@ for (const pkg of packages) {
         if (pkg.manifest.name === '@studio/api') {
           const sourcePath = relative(resolve(pkg.path, 'src'), file);
           const targetPath = relative(resolve(pkg.path, 'src'), target);
+          if (sourcePath.startsWith('context/') && targetPath.startsWith('projects/'))
+            message('上下文能力不得依赖项目业务，由调用方提供作用域和输入');
+          if (
+            sourcePath.startsWith('generation/runtime/') &&
+            /^(projects|context|generation\/providers|generation\/http|generation\/routing)\//.test(
+              targetPath,
+            )
+          )
+            message('工具执行循环不得依赖服务商协议或项目实现');
+          if (
+            sourcePath.startsWith('projects/ports/') &&
+            targetPath.startsWith('projects/') &&
+            !/^projects\/(ports|shared)\//.test(targetPath)
+          )
+            message('项目存储端口只引用共享模型，不得引用具体实现');
+          if (
+            /^projects\/(authoring|conversation)\//.test(sourcePath) &&
+            targetPath.startsWith('projects/persistence/')
+          )
+            message('业务服务必须通过存储端口使用持久化能力');
           if (sourcePath.startsWith('generation/') && targetPath.startsWith('projects/'))
             message('模型生成模块不得依赖项目业务');
           if (
