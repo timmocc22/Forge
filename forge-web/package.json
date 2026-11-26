@@ -1,0 +1,63 @@
+{
+  "name": "forge-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Forge Vue and Tauri frontend",
+  "engines": {
+    "node": "^22.13.0 || ^24.0.0",
+    "pnpm": ">=9.6.0 <10"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build:packages": "pnpm --filter @studio/contracts build && pnpm --filter @studio/plugin-sdk build && pnpm --filter @studio/ui build",
+    "build": "pnpm build:packages && vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:contracts": "node --import tsx scripts/verify-contracts.ts",
+    "api:generate": "openapi-typescript contracts/forge-api.v1.openapi.json -o packages/contracts/src/api.generated.ts && prettier --write packages/contracts/src/api.generated.ts",
+    "format": "prettier --write \"src/**/*.{ts,vue,less}\" \"packages/**/*.{ts,json}\" \"scripts/**/*.ts\" \"*.{json,ts,yaml}\"",
+    "desktop:dev": "tauri dev",
+    "desktop:dev:running": "tauri dev --config src-tauri/tauri.running.conf.json",
+    "desktop:build:web": "pnpm build:packages && vue-tsc --noEmit && vite build --mode desktop",
+    "desktop:build": "tauri build",
+    "desktop:check": "cargo check --locked --manifest-path src-tauri/Cargo.toml",
+    "preview": "vite preview --host 127.0.0.1 --port 5179"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "^1.56.1",
+    "@tauri-apps/cli": "2.11.5",
+    "@types/node": "^22.19.0",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "10.13.0",
+    "eslint-plugin-vue": "^10.5.1",
+    "globals": "^16.5.0",
+    "less": "^4.4.2",
+    "openapi-typescript": "7.13.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.6",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vite": "^7.3.7",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.1.1",
+    "@types/markdown-it": "14.2.0"
+  },
+  "packageManager": "pnpm@9.6.0",
+  "type": "module",
+  "dependencies": {
+    "@studio/contracts": "workspace:*",
+    "@studio/plugin-sdk": "workspace:*",
+    "@studio/ui": "workspace:*",
+    "@tauri-apps/api": "2.11.1",
+    "@tauri-apps/plugin-dialog": "2.7.1",
+    "@tauri-apps/plugin-fs": "2.5.1",
+    "markdown-it": "15.0.3",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.22",
+    "zod": "4.6.7"
+  }
+}

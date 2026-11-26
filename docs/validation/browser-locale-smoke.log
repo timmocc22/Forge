@@ -1,0 +1,5 @@
+/api/health 200 with 13 preferred languages
+/api/providers 200 with 13 preferred languages
+/api/html-projects 200 with 13 preferred languages
+/api/html-projects/storage/status 200 with 13 preferred languages
+Browser loaded without project error or model connection placeholder; all three services healthy.

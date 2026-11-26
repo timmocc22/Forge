@@ -1,0 +1,69 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.2)
+
+2026-11-10T10:28:08.474+08:00  INFO 3860 --- [           main] dev.forge.ForgeApplicationKt             : Starting ForgeApplicationKt v0.1.0 using Java 25.0.3 with PID 3860 (/private/tmp/forge-services-split/workspace/forge-api/build/libs/forge-api-0.1.0.jar started by yanjiachuan in /private/tmp/forge-services-split/workspace/forge-api)
+2026-11-10T10:28:08.476+08:00  INFO 3860 --- [           main] dev.forge.ForgeApplicationKt             : No active profile set, falling back to 1 default profile: "default"
+2026-11-10T10:28:09.215+08:00  INFO 3860 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 3108 (http)
+2026-11-10T10:28:09.224+08:00  INFO 3860 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-10T10:28:09.224+08:00  INFO 3860 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.27]
+2026-11-10T10:28:09.236+08:00  INFO 3860 --- [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 709 ms
+2026-11-10T10:28:10.253+08:00  INFO 3860 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-11-10T10:28:10.282+08:00  INFO 3860 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 3108 (http) with context path '/'
+2026-11-10T10:28:10.289+08:00  INFO 3860 --- [           main] dev.forge.ForgeApplicationKt             : Started ForgeApplicationKt in 2.066 seconds (process running for 2.359)
+2026-11-10T10:28:10.351+08:00  INFO 3860 --- [omcat-handler-0] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-10T10:28:10.351+08:00  INFO 3860 --- [omcat-handler-0] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-10T10:28:10.352+08:00  INFO 3860 --- [omcat-handler-0] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+
+> forge-web@0.1.0 test:e2e /private/tmp/forge-services-split/workspace/forge-web
+> playwright test
+
+[WebServer] (node:3894) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:3915) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 30 tests using 1 worker
+
+(node:3922) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/e2e/html-projects.spec.ts:6:1 › AI creative options default to automatic and retain individual manual choices (1.2s)
+  ✓   2 tests/e2e/html-projects.spec.ts:30:3 › AI guides a key creative decision during planning: option (605ms)
+  ✓   3 tests/e2e/html-projects.spec.ts:30:3 › AI guides a key creative decision during planning: manual (653ms)
+  ✓   4 tests/e2e/html-projects.spec.ts:30:3 › AI guides a key creative decision during planning: delegate (522ms)
+  ✓   5 tests/e2e/html-projects.spec.ts:95:1 › failed storyboard allows editing the brief and retrying without a selected scene (2.6s)
+  ✓   6 tests/e2e/html-projects.spec.ts:153:1 › Zhipu reasoning selection survives reload and is sent with the next creation (1.2s)
+  ✓   7 tests/e2e/html-projects.spec.ts:246:1 › HTML authoring: storyboard, saved manual edits, focused revision, point editing and export (3.3s)
+  ✓   8 tests/e2e/html-projects.spec.ts:368:1 › mobile: project controls fit and imported HTML stays editable and sandboxed (499ms)
+  ✓   9 tests/e2e/html-projects.spec.ts:405:1 › works show content directly and conversation keeps a bottom composer with resizable preview (1.3s)
+  ✓  10 tests/e2e/html-projects.spec.ts:483:1 › conversation history opens saved work, resizes alongside preview and collapses on mobile (1.3s)
+  ✓  11 tests/e2e/html-projects.spec.ts:570:1 › property panel resizes independently with mouse, keyboard and touch and remembers its width (1.3s)
+  ✓  12 tests/e2e/html-projects.spec.ts:660:1 › unchanged preview stays loaded when generation starts, polls and stops (2.5s)
+  ✓  13 tests/e2e/html-projects.spec.ts:761:1 › generation feedback follows planning, progress, completion, cancellation and failure (8.7s)
+  ✓  14 tests/e2e/html-projects.spec.ts:999:1 › ask current page returns advice, allows locked pages, retries errors and leaves the project unchanged (5.8s)
+  ✓  15 tests/e2e/html-projects.spec.ts:1134:1 › session context menu duplicates, archives, restores and deletes conversations (1.8s)
+  ✓  16 tests/e2e/html-projects.spec.ts:1198:1 › unified assistant refreshes cross-page tool edits, keeps selected page and supports undo (1.4s)
+  ✓  17 tests/e2e/html-projects.spec.ts:1280:1 › personal prompt persists, cancels drafts, toggles off and travels with creation (1.4s)
+  ✓  18 tests/e2e/html-projects.spec.ts:1350:1 › restores a running conversation after reload, stops it and resumes the original question (846ms)
+  ✓  19 tests/e2e/html-projects.spec.ts:1419:1 › recovers a committed reply when its HTTP response is lost (424ms)
+  ✓  20 tests/e2e/html-projects.spec.ts:1444:1 › page conversation renders task results and Markdown after reload (2.7s)
+  ✓  21 tests/e2e/html-projects.spec.ts:1612:1 › multi-step progress survives reload and stopping offers an explicit full retry (655ms)
+  ✓  22 tests/e2e/html-projects.spec.ts:1684:3 › generation uses default tasks and accepts option clarification (659ms)
+  ✓  23 tests/e2e/html-projects.spec.ts:1684:3 › generation uses default tasks and accepts manual clarification (697ms)
+  ✓  24 tests/e2e/html-projects.spec.ts:1684:3 › generation uses default tasks and accepts delegate clarification (672ms)
+  ✓  25 tests/e2e/html-projects.spec.ts:1773:1 › composer clears immediately and sends appended questions in order without erasing a new draft (1.4s)
+  ✓  26 tests/e2e/html-projects.spec.ts:1823:1 › planning accepts additional requirements and keeps them in the brief in send order (1.8s)
+  ✓  27 tests/e2e/html-projects.spec.ts:1868:3 › supplements keep the current task goal with after delivery (1.9s)
+  ✓  28 tests/e2e/html-projects.spec.ts:1868:3 › supplements keep the current task goal with interrupt delivery (1.8s)
+  ✓  29 tests/e2e/html-projects.spec.ts:1970:1 › interrupting generation continues remaining pages with the original goal and supplemental requirement (1.3s)
+  ✓  30 tests/e2e/html-projects.spec.ts:2050:1 › server commands finish without a browser owner and a refreshed composer does not duplicate work (665ms)
+
+  30 passed (59.6s)
+2026-11-10T10:29:11.076+08:00  INFO 3860 --- [ionShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-10T10:29:11.077+08:00  INFO 3860 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete

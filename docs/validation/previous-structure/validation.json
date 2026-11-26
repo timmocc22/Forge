@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-10",
+  "project": "/Users/yanjiachuan/Desktop/Forge-Kotlin",
+  "scope": "Local single-user migration; original Vue/Tauri frontend retained; Kotlin business backend plus Python knowledge service",
+  "tests": {
+    "kotlin": 15,
+    "frontend_unit": 39,
+    "python": 6,
+    "browser_e2e": 30,
+    "total": 90
+  },
+  "checks": {
+    "kotlin_format": "passed",
+    "python_ruff": "passed",
+    "typescript_prettier": "passed",
+    "frontend_build": "passed",
+    "gradle_build": "passed",
+    "http_contract": "passed",
+    "kotlin_python_llamaindex_roundtrip": "passed"
+  },
+  "artifact": {
+    "path": "backend/build/libs/backend-0.1.0.jar",
+    "sha256": "3d15f62e815defaa25881292f0ea85473b5c7ba12f18926d241dda81d23de744"
+  },
+  "fixtures": "Model protocol and embedding tests use local HTTP fixtures; no paid model calls",
+  "not_verified": [
+    "Live paid model providers",
+    "PostgreSQL / pgvector runtime",
+    "Multi-user / multi-instance deployment",
+    "Bundled JVM/Python Tauri installers"
+  ],
+  "delivery_checks": {
+    "workspace_dependencies": "independent; no references to old workspace or staging directory",
+    "desktop_format": "passed",
+    "desktop_frontend_unit": "39 passed",
+    "desktop_python": "6 passed",
+    "packaged_http_contract": "passed",
+    "packaged_same_origin_policy": "passed",
+    "packaged_openapi": "passed",
+    "preview": "http://127.0.0.1:3009"
+  }
+}

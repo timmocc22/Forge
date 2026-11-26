@@ -1,0 +1,84 @@
+
+> Task :formatKotlin
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.jetbrains.kotlin.com.intellij.util.containers.Unsafe (file:/Users/yanjiachuan/.gradle/caches/modules-2/files-2.1/com.facebook/ktfmt/0.64/fb55016d1e328fa7523a15585a37806dfaa8992e/ktfmt-0.64-with-dependencies.jar)
+WARNING: Please consider reporting this to the maintainers of class org.jetbrains.kotlin.com.intellij.util.containers.Unsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/execution/TaskRuntime.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/context/KnowledgeContract.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/infrastructure/Config.kt
+Done formatting /private/tmp/forge-api-independent/settings.gradle.kts
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/context/KnowledgeJobs.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/ForgeApplication.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/context/KnowledgeClient.kt
+Done formatting /private/tmp/forge-api-independent/src/test/kotlin/dev/forge/ContractOwnershipTest.kt
+Done formatting /private/tmp/forge-api-independent/build.gradle.kts
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/api/KnowledgeController.kt
+Done formatting /private/tmp/forge-api-independent/src/test/kotlin/dev/forge/ProviderProtocolTest.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/api/ApiController.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/api/HttpBoundary.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/infrastructure/Json.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/execution/ProjectCommands.kt
+Done formatting /private/tmp/forge-api-independent/src/test/kotlin/dev/forge/MigrationTest.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/infrastructure/ProjectStore.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/generation/ModelGateway.kt
+Done formatting /private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ProjectService.kt
+
+> Task :clean
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :processResources
+
+> Task :checkKotlinFormat
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.jetbrains.kotlin.com.intellij.util.containers.Unsafe (file:/Users/yanjiachuan/.gradle/caches/modules-2/files-2.1/com.facebook/ktfmt/0.64/fb55016d1e328fa7523a15585a37806dfaa8992e/ktfmt-0.64-with-dependencies.jar)
+WARNING: Please consider reporting this to the maintainers of class org.jetbrains.kotlin.com.intellij.util.containers.Unsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+
+> Task :processTestResources NO-SOURCE
+
+> Task :compileKotlin
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/infrastructure/ProjectStore.kt:162:18 Unnecessary non-null assertion (!!) on a non-null receiver of type 'Pair<T (of fun <T> update), Unit>'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/infrastructure/ProjectStore.kt:211:14 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:145:29 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:185:29 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:187:25 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:188:38 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:211:25 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:213:25 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:222:25 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ConversationService.kt:223:47 Unnecessary non-null assertion (!!) on a non-null receiver of type 'ObjectNode'.
+w: file:///private/tmp/forge-api-independent/src/main/kotlin/dev/forge/projects/ProjectService.kt:513:62 Unnecessary non-null assertion (!!) on a non-null receiver of type 'JsonNode'.
+
+> Task :compileJava NO-SOURCE
+> Task :classes
+> Task :resolveMainClassName
+> Task :bootJar
+> Task :jar
+> Task :assemble
+
+> Task :compileTestKotlin
+w: file:///private/tmp/forge-api-independent/src/test/kotlin/dev/forge/ContractOwnershipTest.kt:25:17 'fun fields(): (Mutable)Iterator<(Mutable)Map.(Mutable)Entry<String!, JsonNode!>!>!' is deprecated. Deprecated in Java.
+
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses UP-TO-DATE
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.sqlite.SQLiteJDBCLoader in an unnamed module (file:/Users/yanjiachuan/.gradle/caches/modules-2/files-2.1/org.xerial/sqlite-jdbc/3.51.3.0/a6a5177ff8d35028a8943129aa4a18e850fe1387/sqlite-jdbc-3.51.3.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :test
+> Task :check
+> Task :build
+
+[Incubating] Problems report is available at: file:///private/tmp/forge-api-independent/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.8.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 5s
+10 actionable tasks: 10 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.8.1/userguide/configuration_cache_enabling.html

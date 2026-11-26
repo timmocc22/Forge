@@ -1,85 +1,37 @@
-# Forge · HTML 创作工作台
+# Forge
 
-从创作主题出发，先规划可编辑分镜，再逐页生成、修改与导出 HTML 演示。前端使用 Vue 3 + TypeScript，后端使用 NestJS，多工作区由 pnpm + Lerna 管理，桌面壳沿用 Tauri 2。
+同一仓库中的三个独立工程，保留 Vue 工作台，Kotlin 负责业务，Python 负责知识库。工作区脚本只用于本地联调，各工程构建不读取其他工程源码。
 
-## 创作流程
+| 工程 | 技术栈 | 责任 | 本地端口 |
+| --- | --- | --- | --- |
+| [forge-web](forge-web/README.md) | Vue 3、TypeScript、Vite、Pinia、Tauri | 工作台、预览、桌面壳 | 5179 |
+| [forge-api](forge-api/README.md) | Kotlin、Spring Boot、JDBC | 项目、会话、生成任务、权限边界、公开 API | 3009 |
+| [forge-knowledge](forge-knowledge/README.md) | Python、FastAPI、LlamaIndex、SQLAlchemy | 解析、切块、入库作业、向量检索、重排 | 3017（内部） |
 
-1. 描述主题并选择文本模型。创作选项默认交给 AI 决定，也可单独固定目标读者、页数、画幅或视觉风格。
-2. AI 结合内容、使用场景、已启用的创作偏好、当前项目对话和最近六件未归档作品的摘要，选择受众、1–12 页、画幅、配色和视觉方向，再规划分镜。历史摘要仅供判断相关背景，不会携带其他作品的 HTML；新请求和手动指定的选项优先。方案和简短理由会显示在对话与分镜页，可调整每页标题、目标、内容、布局与顺序，也可在项目风格中编辑视觉方向。没有独立模板库，逐页布局按内容组合。
-   遇到无法合理推断的关键决策时，AI 在对话中给出针对当前内容的建议；可选择建议、自由输入或交给 AI 判断后继续，常规风格与页数不要求提前确认。
-3. 逐页生成，或生成所有未完成页面；锁定页和已完成页会被批量生成跳过。
-4. 在隔离画布中预览，点选静态文字直接替换，或在同一对话中询问页面、描述要求让 AI 修改指定页。
-5. 开启输入框上方的「多步任务」，描述整稿优化目标，或点击「试试整稿优化」填入示例；AI 制定逐页计划、依次执行并检查字段与 HTML 文档结构，全部成功后统一保存。可查看步骤进度、停止任务，失败后可从已保存检查点继续；项目基线变化时重新规划；整次修改支持一次撤销。需要已配置的 AI 模型，本地演示不执行多步修改。
-6. 保存修改、撤销、放映，导出可离线打开的完整 HTML，或下载项目 JSON 备份。
+## 本地启动
 
-支持导入已有完整 HTML，作为单页项目继续创作。项目数据保存在 `.data/html-projects/`，使用版本化清单与可复用内容对象，并保留上一份清单备份；分镜、手动源码和 AI 续改使用同一份服务端文档。刷新恢复当前项目，当前窗口未保存草稿由 IndexedDB 兜底；版本冲突会拒绝覆盖。生成可停止，已完成页面会保留；服务重启会将未完成生成标记为中断，不自动重放模型请求。
-
-产品与代码均已收敛到 HTML 工作台。旧版生成插件、会话、助手与任务队列已删除；旧数据目录不做迁移或删除。当前主流程见 [HTML 工作台设计](docs/HTML_STUDIO.md)。
-
-## 启动
-
-建议使用项目已验证的 Node 20.20.2 与 pnpm 9.6.0。
+要求 Node 22.13+/24、pnpm 9、JDK 25、Python 3.12/3.13、uv。现有本地 Node 工具链放在 `forge-web/.toolchains`，工作区脚本会使用它；不会修改系统环境。uv 需在 PATH 中。
 
 ```sh
-pnpm install --frozen-lockfile
-cp .env.example .env
-pnpm dev
+python3 scripts/init-local.py
+(cd forge-web && pnpm install --frozen-lockfile && pnpm build)
+(cd forge-api && ./gradlew build)
+(cd forge-knowledge && uv sync --frozen)
+./scripts/start.sh --knowledge
 ```
 
-- 工作台：[127.0.0.1:5177](http://127.0.0.1:5177)
-- API：[127.0.0.1:3007/api/health](http://127.0.0.1:3007/api/health)
-- 桌面窗口：已有 `pnpm dev` 时运行 `pnpm desktop:dev:running`
-- 本机安装包：`pnpm desktop:build -- --locked`
+打开 http://127.0.0.1:5179 。`./scripts/dev.sh --knowledge` 启动开发模式。去掉 `--knowledge` 可以单独联调前端和 API；知识库相关操作需要 Python 服务在线。每个工程也可按各自 README 单独启动。
 
-## 模型配置
+初始化脚本仅创建缺失的 `.env`，生成本地共享服务令牌，不覆盖已有配置。模型密钥留空；文档索引前配置 Python 的 embedding 地址、模型、维度和密钥。默认业务模型为 demo，启动不调用付费模型。
 
-默认 `PROVIDER=demo` 使用明确标注的本地规则样例，用于验证工作流。分镜和页面不代表 AI 生成，演示问答只返回规则说明，不执行自动修改。
-
-真实生成复用已有文本服务适配器，在根目录 `.env` 配置以下任意一组后重启 API，再通过界面的模型入口选择。密钥只在服务端使用，不写入项目内容或前端。
-
-```dotenv
-# 选择你实际使用的默认服务商
-PROVIDER=openai
-OPENAI_API_KEY=你的服务端密钥
-OPENAI_TEXT_MODEL=账户可用的文本模型
-
-# 或配置 DeepSeek
-DEEPSEEK_API_KEY=你的服务端密钥
-DEEPSEEK_TEXT_MODEL=账户可用的文本模型
-
-# 或配置智谱
-ZHIPU_API_KEY=你的服务端密钥
-ZHIPU_TEXT_MODEL=账户可用的文本模型
-```
-
-文本模型需要兼容当前服务适配器使用的 Responses 接口；分镜还需要返回可通过本地 Schema 校验的结构。助手对话还要求端点支持原生 function calling 与工具结果回传，不支持时会报错，不会回退为声称已修改的文字回复。端点、代理和候选模型配置继续使用 `.env.example` 中的对应变量。候选模型不代表已验证账户权限。自动化验收使用演示或测试适配器，不调用付费模型。
-
-选择智谱后，可在模型面板设置思考等级 `low`、`high` 或 `max`。选择会随项目和生成任务保存，并同时用于分镜规划与页面生成；旧配置默认使用 `high`。GLM-5.3 不支持关闭思考，不能传 `none`。
-
-## 页面助手工具调用
-
-默认对话入口同时支持「解释一下这页的结构」和「把第二页标题改成分数的日常应用」。保留「询问模式」开关，开启后仅提供建议，后端也会拒绝修改工具。
-
-- `list_scenes({})`：返回页面编号、ID、标题、锁定状态和项目版本。
-- `read_scene({ sceneId })`：读取指定页面的内容、HTML 和版本。
-- `revise_scene({ sceneId, expectedRevision, instruction })`：修改未锁定页面，保持页面字段与 HTML 一致。
-
-模型提出调用，后端校验参数、项目归属、锁定状态和版本，再执行修改并把结果回传给模型。每轮最多执行 12 次工具调用；草稿修改与最终对话在一次存储写入中保存，失败、超时或版本冲突不会写入本轮修改。成功后刷新页面列表和预览，可通过撤销恢复本轮修改前的项目。自动化测试覆盖工具传输和执行、失败回滚与浏览器响应同步，尚未作为真实服务商兼容性验收。
-
-## 开发验证
+## 验证与部署
 
 ```sh
-pnpm check
-pnpm test:e2e
-pnpm format:check
+./scripts/test.sh                  # 各工程构建与单元测试、契约快照检查
+python3 scripts/check-boundaries.py # 检查构建边界、API jar 无前端资源
+PLAYWRIGHT_CHANNEL=chrome ./scripts/test.sh e2e
 ```
 
-E2E 主流程现在是 `tests/e2e/html-projects.spec.ts`，使用独立端口 5188 / 3108 和 `.data/e2e-html-projects`。缺少 Playwright Chromium 时可运行 `pnpm exec playwright install chromium`，或使用已安装 Chrome：`PLAYWRIGHT_CHANNEL=chrome pnpm test:e2e`。
+[架构和数据归属](docs/ARCHITECTURE.md) · [接口契约流程](contracts/README.md) · [部署](deploy/README.md) · [迁移说明](docs/MIGRATION.md) · [验证记录](docs/VALIDATION.md)
 
-## 当前边界
-
-首版已实现分镜创作、逐页编辑、持久化、撤销、隔离预览与 HTML 导出。检查按钮检查当前页的文字边界、字号、图片加载和脚本错误，不能替代内容与视觉审核。点选替换支持源 HTML 中可定位且不含子元素的静态文字；动态或嵌套内容使用当前页 AI 修改。
-
-项目 JSON 当前用于备份，尚未提供 JSON 导入。素材库、圈画批注、变量模板、时间轴、旁白、MP4 和自动返修尚未实现，后续方向见 [路线图](docs/ROADMAP.md)。API 仍为单机单进程服务，不支持多用户或多实例共享项目存储。
-
-执行基础已加入服务端命令队列、可恢复多步草稿、页面冲突合并、统一上下文与检索端口、独立工具执行循环。具体边界见 [架构说明](docs/ARCHITECTURE.md)。当前未启用并行多 Agent 写作或实际知识库检索。
+当前交付面向本地单用户。真实模型、PostgreSQL/pgvector、容器运行、安装包和多实例部署的验证范围见验证记录。

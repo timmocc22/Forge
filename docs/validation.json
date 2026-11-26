@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-10",
+  "project": "/Users/yanjiachuan/Desktop/Forge-Kotlin",
+  "scope": "Three independent applications in one repository; local single-user deployment",
+  "applications": {
+    "web": "forge-web",
+    "api": "forge-api",
+    "knowledge": "forge-knowledge"
+  },
+  "tests": {
+    "kotlin": 18,
+    "frontend_unit": 39,
+    "python": 9,
+    "browser_e2e": 30,
+    "total": 96
+  },
+  "checks": {
+    "kotlin_format": "passed",
+    "python_ruff": "passed",
+    "typescript_prettier": "passed",
+    "frontend_build": "passed",
+    "gradle_build": "passed",
+    "http_contract": "passed",
+    "kotlin_python_llamaindex_roundtrip": "passed",
+    "contract_snapshots": "passed",
+    "application_build_boundaries": "passed",
+    "api_jar_without_frontend": "passed",
+    "final_preview_browser_smoke": "passed",
+    "browser_many_preferred_languages": "passed: 13 locales, initial API endpoints and browser UI"
+  },
+  "artifact": {
+    "path": "forge-api/build/libs/forge-api-0.1.0.jar",
+    "sha256": "436e32af23f74e867216ea4d7a302f8ffc5294fe1f591366054ccd902bb7a28c"
+  },
+  "preview": {
+    "web": "http://127.0.0.1:5179",
+    "api": "http://127.0.0.1:3009/api/health",
+    "knowledge": "http://127.0.0.1:3017/health"
+  },
+  "backup": "/private/tmp/forge-before-service-split-20261110-103024",
+  "fixtures": "Model protocol and embedding tests use local HTTP fixtures; no paid model calls",
+  "validation_locations": {
+    "unit_build_and_roundtrip": "/Users/yanjiachuan/Desktop/Forge-Kotlin",
+    "browser_e2e": "/private/tmp/forge-services-split/workspace (split structure)",
+    "isolated_api_build": "/private/tmp/forge-api-independent (no sibling frontend or Python sources)",
+    "final_browser_smoke": "/Users/yanjiachuan/Desktop/Forge-Kotlin"
+  },
+  "not_verified": [
+    "Live paid model providers",
+    "PostgreSQL / pgvector runtime",
+    "Docker image build or Compose runtime (YAML statically checked only)",
+    "Multi-user / multi-instance deployment",
+    "Bundled JVM/Python Tauri installers"
+  ]
+}

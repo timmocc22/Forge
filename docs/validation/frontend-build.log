@@ -1,0 +1,73 @@
+
+> forge-web@0.1.0 build /Users/yanjiachuan/Desktop/Forge-Kotlin/forge-web
+> pnpm build:packages && vue-tsc --noEmit && vite build
+
+
+> forge-web@0.1.0 build:packages /Users/yanjiachuan/Desktop/Forge-Kotlin/forge-web
+> pnpm --filter @studio/contracts build && pnpm --filter @studio/plugin-sdk build && pnpm --filter @studio/ui build
+
+
+> @studio/contracts@0.1.0 build /Users/yanjiachuan/Desktop/Forge-Kotlin/forge-web/packages/contracts
+> tsup src/index.ts --format esm,cjs --dts --clean
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Target: es2022
+CLI Cleaning output folder
+ESM Build start
+CJS Build start
+DTS Build start
+ESM dist/index.js 11.71 KB
+ESM ⚡️ Build success in 700ms
+CJS dist/index.cjs 16.07 KB
+CJS ⚡️ Build success in 700ms
+DTS ⚡️ Build success in 706ms
+DTS dist/index.d.ts  105.96 KB
+DTS dist/index.d.cts 105.96 KB
+
+> @studio/plugin-sdk@0.1.0 build /Users/yanjiachuan/Desktop/Forge-Kotlin/forge-web/packages/plugin-sdk
+> tsup src/index.ts --format esm,cjs --dts --clean
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Target: es2022
+CLI Cleaning output folder
+ESM Build start
+CJS Build start
+ESM dist/index.js 426.00 B
+ESM ⚡️ Build success in 13ms
+CJS dist/index.cjs 1.44 KB
+CJS ⚡️ Build success in 13ms
+DTS Build start
+DTS ⚡️ Build success in 382ms
+DTS dist/index.d.ts  982.00 B
+DTS dist/index.d.cts 982.00 B
+
+> @studio/ui@0.1.0 build /Users/yanjiachuan/Desktop/Forge-Kotlin/forge-web/packages/ui
+> vue-tsc --noEmit
+
+vite v7.3.7 building client environment for production...
+transforming...
+node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 216 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.32 kB │ gzip:   0.71 kB
+dist/assets/index-CYgxmVkA.css   85.22 kB │ gzip:  14.86 kB
+dist/assets/index-B610yM10.js     0.17 kB │ gzip:   0.16 kB
+dist/assets/index-By_wCQBo.js     2.58 kB │ gzip:   1.18 kB
+dist/assets/index-Cai5NTaQ.js   395.53 kB │ gzip: 141.06 kB
+✓ built in 1.27s

@@ -1,0 +1,45 @@
+
+> forge-kotlin@0.1.0 test:e2e /private/tmp/forge-kotlin-migration/project
+> pnpm exec playwright test
+
+[WebServer] (node:69152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:69175) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 30 tests using 1 worker
+
+(node:69182) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/e2e/html-projects.spec.ts:6:1 › AI creative options default to automatic and retain individual manual choices (1.3s)
+  ✓   2 tests/e2e/html-projects.spec.ts:30:3 › AI guides a key creative decision during planning: option (575ms)
+  ✓   3 tests/e2e/html-projects.spec.ts:30:3 › AI guides a key creative decision during planning: manual (630ms)
+  ✓   4 tests/e2e/html-projects.spec.ts:30:3 › AI guides a key creative decision during planning: delegate (707ms)
+  ✓   5 tests/e2e/html-projects.spec.ts:95:1 › failed storyboard allows editing the brief and retrying without a selected scene (2.3s)
+  ✓   6 tests/e2e/html-projects.spec.ts:153:1 › Zhipu reasoning selection survives reload and is sent with the next creation (1.6s)
+  ✓   7 tests/e2e/html-projects.spec.ts:246:1 › HTML authoring: storyboard, saved manual edits, focused revision, point editing and export (3.7s)
+  ✓   8 tests/e2e/html-projects.spec.ts:368:1 › mobile: project controls fit and imported HTML stays editable and sandboxed (518ms)
+  ✓   9 tests/e2e/html-projects.spec.ts:405:1 › works show content directly and conversation keeps a bottom composer with resizable preview (1.5s)
+  ✓  10 tests/e2e/html-projects.spec.ts:483:1 › conversation history opens saved work, resizes alongside preview and collapses on mobile (1.9s)
+  ✓  11 tests/e2e/html-projects.spec.ts:570:1 › property panel resizes independently with mouse, keyboard and touch and remembers its width (1.5s)
+  ✓  12 tests/e2e/html-projects.spec.ts:660:1 › unchanged preview stays loaded when generation starts, polls and stops (2.8s)
+  ✓  13 tests/e2e/html-projects.spec.ts:761:1 › generation feedback follows planning, progress, completion, cancellation and failure (10.8s)
+  ✓  14 tests/e2e/html-projects.spec.ts:999:1 › ask current page returns advice, allows locked pages, retries errors and leaves the project unchanged (5.1s)
+  ✓  15 tests/e2e/html-projects.spec.ts:1134:1 › session context menu duplicates, archives, restores and deletes conversations (2.0s)
+  ✓  16 tests/e2e/html-projects.spec.ts:1198:1 › unified assistant refreshes cross-page tool edits, keeps selected page and supports undo (1.8s)
+  ✓  17 tests/e2e/html-projects.spec.ts:1280:1 › personal prompt persists, cancels drafts, toggles off and travels with creation (2.2s)
+  ✓  18 tests/e2e/html-projects.spec.ts:1350:1 › restores a running conversation after reload, stops it and resumes the original question (1.3s)
+  ✓  19 tests/e2e/html-projects.spec.ts:1419:1 › recovers a committed reply when its HTTP response is lost (618ms)
+  ✓  20 tests/e2e/html-projects.spec.ts:1444:1 › page conversation renders task results and Markdown after reload (4.1s)
+  ✓  21 tests/e2e/html-projects.spec.ts:1612:1 › multi-step progress survives reload and stopping offers an explicit full retry (1.4s)
+  ✓  22 tests/e2e/html-projects.spec.ts:1684:3 › generation uses default tasks and accepts option clarification (1.3s)
+  ✓  23 tests/e2e/html-projects.spec.ts:1684:3 › generation uses default tasks and accepts manual clarification (957ms)
+  ✓  24 tests/e2e/html-projects.spec.ts:1684:3 › generation uses default tasks and accepts delegate clarification (894ms)
+  ✓  25 tests/e2e/html-projects.spec.ts:1773:1 › composer clears immediately and sends appended questions in order without erasing a new draft (1.5s)
+  ✓  26 tests/e2e/html-projects.spec.ts:1823:1 › planning accepts additional requirements and keeps them in the brief in send order (1.9s)
+  ✓  27 tests/e2e/html-projects.spec.ts:1868:3 › supplements keep the current task goal with after delivery (2.0s)
+  ✓  28 tests/e2e/html-projects.spec.ts:1868:3 › supplements keep the current task goal with interrupt delivery (1.8s)
+  ✓  29 tests/e2e/html-projects.spec.ts:1970:1 › interrupting generation continues remaining pages with the original goal and supplemental requirement (1.4s)
+  ✓  30 tests/e2e/html-projects.spec.ts:2050:1 › server commands finish without a browser owner and a refreshed composer does not duplicate work (781ms)
+
+  30 passed (1.1m)

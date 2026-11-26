@@ -1,0 +1,5 @@
+
+> forge-kotlin@0.1.0 test:contracts /private/tmp/forge-kotlin-migration/project
+> node --import tsx scripts/verify-contracts.ts
+
+HTTP contract checks passed: catalog, create, plan, build, conversation, save, conflict, undo, delete

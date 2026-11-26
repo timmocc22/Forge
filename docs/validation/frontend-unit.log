@@ -1,0 +1,19 @@
+
+> forge-web@0.1.0 test /Users/yanjiachuan/Desktop/Forge-Kotlin/forge-web
+> vitest run
+
+
+ RUN  v3.2.7 /Users/yanjiachuan/Desktop/Forge-Kotlin/forge-web
+
+ ✓ src/platform/api-base.spec.ts (7 tests) 3ms
+ ✓ src/platform/desktop.spec.ts (3 tests) 10ms
+ ✓ src/platform/storage.spec.ts (1 test) 3ms
+ ✓ src/components/markdown-content/render.spec.ts (4 tests) 7ms
+ ✓ src/stores/creative-preferences.spec.ts (2 tests) 3ms
+ ✓ packages/contracts/src/contracts.spec.ts (22 tests) 7ms
+
+ Test Files  6 passed (6)
+      Tests  39 passed (39)
+   Start at  10:32:10
+   Duration  407ms (transform 229ms, setup 0ms, collect 427ms, tests 33ms, environment 1ms, prepare 526ms)
+

@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Forge · Kotlin 后台架构提案",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1390,
+      820
+    ],
+    "views": [
+      {
+        "id": "creation-path",
+        "label": "创作请求",
+        "focus": [
+          "workspace",
+          "http-api",
+          "task-runtime",
+          "model-gateway",
+          "model-services"
+        ],
+        "note": "先保存命令，再由后台执行；前端查询任务状态，模型调用不占用数据库事务。"
+      },
+      {
+        "id": "safe-execution",
+        "label": "任务与工具",
+        "focus": [
+          "task-runtime",
+          "context-builder",
+          "task-checkpoints",
+          "scene-tools"
+        ],
+        "note": "虚拟线程执行任务；工具受权限、页面锁、版本和调用预算约束。"
+      },
+      {
+        "id": "durable-content",
+        "label": "存储与提交",
+        "focus": [
+          "project-domain",
+          "task-checkpoints",
+          "project-storage",
+          "content-storage"
+        ],
+        "note": "本地选择 SQLite 与文件目录；云端选择 PostgreSQL 与对象存储，不要求同时部署。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "workspace",
+      "type": "frontend",
+      "label": "创作工作台",
+      "sublabel": "Vue 3 · 浏览器 / Tauri",
+      "pos": [
+        26,
+        280
+      ],
+      "size": [
+        210,
+        88
+      ]
+    },
+    {
+      "id": "http-api",
+      "type": "backend",
+      "label": "HTTP 接口",
+      "sublabel": "Spring MVC · OpenAPI",
+      "pos": [
+        299,
+        280
+      ],
+      "size": [
+        210,
+        88
+      ]
+    },
+    {
+      "id": "task-runtime",
+      "type": "backend",
+      "label": "任务执行与工具循环",
+      "sublabel": "虚拟线程 · 取消 · 并发限额",
+      "pos": [
+        581,
+        280
+      ],
+      "size": [
+        230,
+        88
+      ]
+    },
+    {
+      "id": "model-gateway",
+      "type": "backend",
+      "label": "模型网关",
+      "sublabel": "路由 · 协议适配 · 超时",
+      "pos": [
+        881,
+        280
+      ],
+      "size": [
+        210,
+        88
+      ]
+    },
+    {
+      "id": "model-services",
+      "type": "external",
+      "label": "外部模型服务",
+      "sublabel": "OpenAI / DeepSeek / 智谱",
+      "pos": [
+        1154,
+        280
+      ],
+      "size": [
+        210,
+        88
+      ]
+    },
+    {
+      "id": "context-builder",
+      "type": "backend",
+      "label": "对话与上下文",
+      "sublabel": "消息 · 输入决策 · 预算",
+      "tag": "检索端口预留",
+      "pos": [
+        581,
+        70
+      ],
+      "size": [
+        230,
+        88
+      ]
+    },
+    {
+      "id": "project-domain",
+      "type": "backend",
+      "label": "项目与页面",
+      "sublabel": "分镜 · 版本 · 撤销 · 合并",
+      "pos": [
+        299,
+        510
+      ],
+      "size": [
+        210,
+        88
+      ]
+    },
+    {
+      "id": "task-checkpoints",
+      "type": "backend",
+      "label": "可靠任务状态",
+      "sublabel": "命令 · 草稿 · 检查点",
+      "pos": [
+        581,
+        510
+      ],
+      "size": [
+        230,
+        88
+      ]
+    },
+    {
+      "id": "scene-tools",
+      "type": "backend",
+      "label": "受控页面工具",
+      "sublabel": "读取 · 修改 · 锁定与版本校验",
+      "pos": [
+        881,
+        510
+      ],
+      "size": [
+        210,
+        88
+      ]
+    },
+    {
+      "id": "project-storage",
+      "type": "database",
+      "label": "结构化数据存储",
+      "sublabel": "本地 SQLite / 云端 PostgreSQL",
+      "tag": "Spring JDBC · 短事务",
+      "pos": [
+        428,
+        700
+      ],
+      "size": [
+        270,
+        88
+      ]
+    },
+    {
+      "id": "content-storage",
+      "type": "database",
+      "label": "内容对象存储",
+      "sublabel": "本地文件 / 云端对象存储",
+      "tag": "不可变 HTML · 资源 · 历史快照",
+      "pos": [
+        881,
+        700
+      ],
+      "size": [
+        270,
+        88
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Kotlin + JDK 25 · Spring Boot 4.1.x · 模块化单体（拟建）",
+      "wraps": [
+        "http-api",
+        "task-runtime",
+        "model-gateway",
+        "context-builder",
+        "project-domain",
+        "task-checkpoints",
+        "scene-tools"
+      ],
+      "pad": 30
+    }
+  ],
+  "connections": [
+    {
+      "id": "submit-command",
+      "from": "workspace",
+      "to": "http-api",
+      "label": "REST / 状态查询",
+      "variant": "emphasis",
+      "labelDy": -38
+    },
+    {
+      "id": "dispatch-command",
+      "from": "http-api",
+      "to": "task-runtime",
+      "label": "持久化后执行",
+      "variant": "emphasis"
+    },
+    {
+      "id": "request-generation",
+      "from": "task-runtime",
+      "to": "model-gateway",
+      "label": "生成 / 工具回传",
+      "variant": "emphasis",
+      "labelDy": -31
+    },
+    {
+      "id": "provider-http",
+      "from": "model-gateway",
+      "to": "model-services",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "project-operations",
+      "from": "http-api",
+      "to": "project-domain",
+      "label": "编辑 / 版本提交",
+      "labelDy": 24
+    },
+    {
+      "id": "assemble-context",
+      "from": "task-runtime",
+      "to": "context-builder",
+      "label": "组装上下文"
+    },
+    {
+      "id": "persist-task",
+      "from": "task-runtime",
+      "to": "task-checkpoints",
+      "label": "保存 / 恢复进度",
+      "labelDy": 24
+    },
+    {
+      "id": "execute-tools",
+      "from": "task-runtime",
+      "to": "scene-tools",
+      "label": "校验后执行"
+    },
+    {
+      "id": "save-project",
+      "from": "project-domain",
+      "to": "project-storage",
+      "label": "乐观锁提交",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "save-checkpoint",
+      "from": "task-checkpoints",
+      "to": "project-storage",
+      "label": "任务持久化",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "store-content",
+      "from": "project-storage",
+      "to": "content-storage",
+      "label": "引用已写入对象"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "业务边界",
+      "items": [
+        "项目、对话、执行、模型适配按模块隔离；统一运行在一个后台进程。",
+        "页面工具复用项目规则；前后端协议由 OpenAPI 生成类型。"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "一致性与恢复",
+      "items": [
+        "命令先落库；调用模型期间不持有事务，最终提交再检查版本。",
+        "重启标记中断，手动重试复用检查点；外部模型调用可能重复。"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "两种部署选择",
+      "items": [
+        "本地：Tauri + 本地 JVM 服务 + SQLite + 文件目录。",
+        "云端：Web / Tauri + HTTPS 与项目授权 + PostgreSQL + 对象存储。"
+      ]
+    }
+  ]
+}

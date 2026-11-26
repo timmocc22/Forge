@@ -1,0 +1,19 @@
+{
+  "diagram_type": "architecture",
+  "proposal": true,
+  "specification": {
+    "path": "/Users/yanjiachuan/Desktop/Forge/docs/architecture/forge-kotlin.architecture.json",
+    "sha256": "80b828d224faa41a01e9293195ed40cc5150da1a741815e90c183aa3331c682e",
+    "bytes": 7292
+  },
+  "artifact": {
+    "path": "/Users/yanjiachuan/Desktop/Forge/docs/architecture/forge-kotlin.html",
+    "sha256": "eb0fb81d46176a37e0f13be283949a5caaf5e82258663cefe9c75645b2f82744",
+    "bytes": 718862
+  },
+  "validation": "9/9 showcase, 0 errors, 0 warnings",
+  "browser_evidence": "passed",
+  "visual_review": "passed",
+  "review_scope": "Light and dark screenshots; desktop containment at 1440x900, 1600x1000, 1920x1080, 2048x1320",
+  "browser_receipt": "forge-kotlin.visual-check.json"
+}
